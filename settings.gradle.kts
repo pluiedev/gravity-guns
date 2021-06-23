@@ -8,4 +8,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "mod-template"
+rootProject.name = "gravity-guns"
