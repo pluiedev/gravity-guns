@@ -16,6 +16,12 @@
         "adapter": "kotlin",
         "value": "com.leocth.gravityguns.GravityGuns"
       }
+    ],
+    "client": [
+      {
+        "adapter": "kotlin",
+        "value": "com.leocth.gravityguns.client.GravityGunsClient"
+      }
     ]
   },
   "depends": {
