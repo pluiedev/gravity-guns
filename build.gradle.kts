@@ -5,7 +5,9 @@ plugins {
 }
 
 repositories {
-
+    maven("https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/") {
+        name = "GeckoLib"
+    }
 }
 
 dependencies {
@@ -14,6 +16,7 @@ dependencies {
     val floaderVersion: String by project
     val fapiVersion: String by project
     val flkVersion: String by project
+    val geckolibVersion: String by project
 
     minecraft("com.mojang:minecraft:$minecraftVersion")
     mappings("net.fabricmc:yarn:$yarnVersion:v2")
@@ -22,6 +25,7 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fapiVersion")
 
     modImplementation("net.fabricmc:fabric-language-kotlin:$flkVersion")
+    modImplementation("software.bernie.geckolib:geckolib-fabric-1.17:$geckolibVersion:dev")
 }
 
 java {
