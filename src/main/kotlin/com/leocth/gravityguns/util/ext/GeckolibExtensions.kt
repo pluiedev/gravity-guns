@@ -1,4 +1,4 @@
-package com.leocth.gravityguns.util
+package com.leocth.gravityguns.util.ext
 
 import software.bernie.geckolib3.core.IAnimatable
 import software.bernie.geckolib3.core.builder.AnimationBuilder

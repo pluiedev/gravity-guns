@@ -1,13 +1,9 @@
 package com.leocth.gravityguns.item
 
-import net.minecraft.block.Blocks
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.FallingBlockEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.item.ItemUsageContext
-import net.minecraft.util.ActionResult
+import net.minecraft.nbt.NbtHelper
 import net.minecraft.util.Hand
 import net.minecraft.util.TypedActionResult
 import net.minecraft.util.hit.HitResult
@@ -24,8 +20,8 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
 
     override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
         if (!world.isClient) {
-            println(user.rotationVector)
             val stack = user.getStackInHand(hand)
+
             val rayCtx = RaycastContext(
                 /*start = */ user.eyePos,
                 /*end = */ user.rotationVector.multiply(20.0),
@@ -38,9 +34,8 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
             if (hit.type == HitResult.Type.BLOCK) {
                 val blockState = world.getBlockState(hit.blockPos)
 
-                val pos = hit.blockPos
-                val fallingEntity = FallingBlockEntity(world, pos.x + 0.5, pos.y + 2.0, pos.z + 0.5, blockState)
-                world.spawnEntity(fallingEntity)
+                val tag = stack.orCreateTag
+                tag.put("block", NbtHelper.fromBlockState(blockState))
 
                 return TypedActionResult.consume(stack)
             }
@@ -49,7 +44,7 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
     }
 
     override fun registerControllers(data: AnimationData) {
-        val controller = AnimationController(this, "controller", 20f) { event ->
+        val controller = AnimationController(this, "controller", 5f) { event ->
             //event.controller.setAnimation {
                 //it.addAnimation("test")
             //}
