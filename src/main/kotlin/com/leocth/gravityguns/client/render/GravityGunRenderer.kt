@@ -39,7 +39,8 @@ class GravityGunRenderer: GeoItemRenderer<GravityGunItem>(GravityGunModel) {
             matrices.frame {
                 val y = 0.1 * MathHelper.sin(ticks / 100f) - 0.05
 
-                it.translate(0.0, y, -5.0)
+                it.translate(0.0, y, -10.0)
+                it.scale(2.0f, 2.0f, 2.0f)
                 it.multiply(Quaternion(10f, 10f, 10f, true))
                 client.blockRenderManager.renderBlockAsEntity(state, it, vertexConsumers, light, overlay)
             }

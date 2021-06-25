@@ -1,5 +1,8 @@
 package com.leocth.gravityguns.item
 
+import net.minecraft.block.BlockState
+import net.minecraft.entity.FallingBlockEntity
+import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -18,13 +21,52 @@ import software.bernie.geckolib3.core.manager.AnimationFactory
 class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
     private val factory = AnimationFactory(this)
 
+    companion object {
+        fun getHeldBlock(stack: ItemStack): BlockState
+            = NbtHelper.toBlockState(stack.orCreateTag.getCompound("block"))
+        fun setHeldBlock(stack: ItemStack, value: BlockState) {
+            stack.orCreateTag.put("block", NbtHelper.fromBlockState(value))
+        }
+        fun hasHeldBlock(stack: ItemStack): Boolean = stack.orCreateTag.contains("block")
+        fun removeHeldBlock(stack: ItemStack) { stack.orCreateTag.remove("block") }
+
+        fun isUsing(stack: ItemStack): Boolean = stack.orCreateTag.getBoolean("isUsing")
+        fun setUsing(stack: ItemStack, value: Boolean) { stack.orCreateTag.putBoolean("isUsing", value) }
+    }
+
+    override fun getMaxUseTime(stack: ItemStack): Int = 20000
+
+    override fun onStoppedUsing(stack: ItemStack, world: World, user: LivingEntity, remainingUseTicks: Int) {
+        println("onStoppedUsing")
+        if (!world.isClient) {
+            if (hasHeldBlock(stack)) {
+                // yeet it
+                val state = getHeldBlock(stack)
+                val fallingBlockEntity = FallingBlockEntity(world, user.x, user.eyeY - 0.1, user.z, state)
+                fallingBlockEntity.timeFalling = 1 // trick MC's verification process
+                fallingBlockEntity.velocity = user.rotationVector.multiply(4.0)
+                world.spawnEntity(fallingBlockEntity)
+
+                removeHeldBlock(stack)
+                if (user is PlayerEntity)
+                    user.itemCooldownManager.set(this, 10)
+
+                setUsing(stack, false)
+            }
+        }
+    }
+
     override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
+
+        println("use")
         if (!world.isClient) {
             val stack = user.getStackInHand(hand)
+            if (isUsing(stack)) return TypedActionResult.pass(stack)
 
+            val end = user.eyePos.add(user.rotationVector.multiply(8.0))
             val rayCtx = RaycastContext(
                 /*start = */ user.eyePos,
-                /*end = */ user.rotationVector.multiply(20.0),
+                /*end = */ end,
                 /*shapeType = */ RaycastContext.ShapeType.COLLIDER,
                 /*fluidHandling = */ RaycastContext.FluidHandling.ANY,
                 /*entity = */ user
@@ -33,10 +75,11 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
 
             if (hit.type == HitResult.Type.BLOCK) {
                 val blockState = world.getBlockState(hit.blockPos)
+                setHeldBlock(stack, blockState)
+                world.removeBlock(hit.blockPos, true)
 
-                val tag = stack.orCreateTag
-                tag.put("block", NbtHelper.fromBlockState(blockState))
-
+                setUsing(stack, true)
+                user.setCurrentHand(hand)
                 return TypedActionResult.consume(stack)
             }
         }
