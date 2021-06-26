@@ -1,4 +1,0 @@
-[submodule "Rayon"]
-	path = Rayon
-	url = https://github.com.cnpmjs.org/LazuriteMC/Rayon.git
-	branch = 1.17
