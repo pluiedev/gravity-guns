@@ -5,9 +5,6 @@ plugins {
 }
 
 repositories {
-    maven("https://jitpack.io") {
-        name = "JitPack"
-    }
     maven("https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/") {
         name = "GeckoLib"
     }
@@ -33,7 +30,6 @@ dependencies {
 
     modImplementation("net.fabricmc:fabric-language-kotlin:$flkVersion")
     modApi("software.bernie.geckolib:geckolib-fabric-1.17:$geckolibVersion:dev")
-    modApi("com.github.LazuriteMC:Rayon:$rayonVersion")
 
 }
 
