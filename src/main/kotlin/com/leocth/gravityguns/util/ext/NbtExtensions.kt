@@ -2,9 +2,11 @@
 package com.leocth.gravityguns.util.ext
 
 import net.fabricmc.fabric.api.util.NbtType
+import net.minecraft.block.BlockState
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtElement
+import net.minecraft.nbt.NbtHelper
 import net.minecraft.util.Identifier
 
 inline fun NbtCompound.getCompound(key: String, action: (NbtCompound) -> Unit): NbtCompound {
@@ -29,6 +31,13 @@ inline fun NbtCompound.getItemStack(key: String): ItemStack
 
 inline fun NbtCompound.putItemStack(key: String, stack: ItemStack)
     = putCompound(key, stack::writeNbt)
+
+inline fun NbtCompound.getBlockState(key: String)
+    = NbtHelper.toBlockState(getCompound(key))
+
+inline fun NbtCompound.putBlockState(key: String, state: BlockState) {
+    put(key, NbtHelper.fromBlockState(state))
+}
 
 inline fun NbtCompound.find(key: String, type: Int, ifFound: (NbtElement) -> Unit): NbtElement? {
     val element = get(key)
