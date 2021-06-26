@@ -5,11 +5,9 @@ plugins {
 }
 
 repositories {
-    /* JitPack's currently broken since it's so stupid that it can't use Java 16
     maven("https://jitpack.io") {
         name = "JitPack"
     }
-     */
     maven("https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/") {
         name = "GeckoLib"
     }
@@ -17,8 +15,6 @@ repositories {
         name = "Haven's Maven"
     }
 }
-
-
 
 dependencies {
     val minecraftVersion: String by project

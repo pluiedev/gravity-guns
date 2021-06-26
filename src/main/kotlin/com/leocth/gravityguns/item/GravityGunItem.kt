@@ -1,6 +1,5 @@
 package com.leocth.gravityguns.item
 
-import com.leocth.gravityguns.entity.BlockAsAnEntity
 import net.minecraft.block.BlockState
 import net.minecraft.entity.FallingBlockEntity
 import net.minecraft.entity.LivingEntity
@@ -40,7 +39,6 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
     override fun onStoppedUsing(stack: ItemStack, world: World, user: LivingEntity, remainingUseTicks: Int) {
         println("onStoppedUsing")
         if (!world.isClient) {
-            /*
             if (hasHeldBlock(stack)) {
                 // yeet it
                 val state = getHeldBlock(stack)
@@ -55,8 +53,6 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
 
                 setUsing(stack, false)
             }
-
-             */
         }
     }
 
@@ -79,12 +75,10 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
 
             if (hit.type == HitResult.Type.BLOCK) {
                 val blockState = world.getBlockState(hit.blockPos)
+                setHeldBlock(stack, blockState)
                 world.removeBlock(hit.blockPos, true)
 
-                val blockPos = hit.blockPos
-                val entity = BlockAsAnEntity(world, blockPos.x + 0.5, blockPos.y.toDouble(), blockPos.z + 0.5)
-                world.spawnEntity(entity)
-
+                setUsing(stack, true)
                 user.setCurrentHand(hand)
                 return TypedActionResult.consume(stack)
             }

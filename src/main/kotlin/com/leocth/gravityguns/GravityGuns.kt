@@ -1,6 +1,5 @@
 package com.leocth.gravityguns
 
-import com.leocth.gravityguns.entity.BlockAsAnEntity
 import com.leocth.gravityguns.item.GravityGunItem
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder
@@ -19,7 +18,6 @@ object GravityGuns: ModInitializer {
 
     override fun onInitialize() {
         Registry.register(Registry.ITEM, id("gravity_gun"), GRAVITY_GUN)
-        Registry.register(Registry.ENTITY_TYPE, id("block"), BlockAsAnEntity.TYPE)
     }
 
     val defaultSettings get() = Item.Settings().group(ITEM_GROUP)
