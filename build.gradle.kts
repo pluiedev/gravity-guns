@@ -1,4 +1,5 @@
 plugins {
+    id("com.github.johnrengelman.shadow") version "5.2.0"
     id("fabric-loom") version "0.8-SNAPSHOT"
     kotlin("jvm") version "1.5.10"
     `maven-publish`
@@ -25,6 +26,7 @@ dependencies {
     val geckolibVersion: String by project
     val rayonVersion: String by project
     val hermesVersion: String by project
+    val libbulletjmeVersion: String by project
 
     minecraft("com.mojang:minecraft:$minecraftVersion")
     mappings("net.fabricmc:yarn:$yarnVersion:v2")
@@ -34,7 +36,13 @@ dependencies {
 
     modImplementation("net.fabricmc:fabric-language-kotlin:$flkVersion")
     modApi("software.bernie.geckolib:geckolib-fabric-1.17:$geckolibVersion:dev")
-    modApi("net.dblsaiko.rayon:rayon:$rayonVersion")
+
+    // FIXME: 2xsaiko's fat dep (i.e. net.dblsaiko.rayon:rayon) doesn't show up correctly as separate modules in IDEA.
+    implementation("com.github.stephengold:Libbulletjme:$libbulletjmeVersion")
+    shadow("com.github.stephengold:Libbulletjme:$libbulletjmeVersion")
+
+    modApi("net.dblsaiko.rayon:rayon-core:$rayonVersion")
+    modApi("net.dblsaiko.rayon:rayon-entity:$rayonVersion")
     modRuntime("dev.inkwell:hermes:$hermesVersion")
 
 }
