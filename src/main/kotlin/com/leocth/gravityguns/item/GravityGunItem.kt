@@ -37,7 +37,6 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
     override fun getMaxUseTime(stack: ItemStack): Int = 20000
 
     override fun onStoppedUsing(stack: ItemStack, world: World, user: LivingEntity, remainingUseTicks: Int) {
-        println("onStoppedUsing")
         if (!world.isClient) {
             if (hasHeldBlock(stack)) {
                 // yeet it
@@ -57,8 +56,6 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
     }
 
     override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
-
-        println("use")
         if (!world.isClient) {
             val stack = user.getStackInHand(hand)
             if (isUsing(stack)) return TypedActionResult.pass(stack)

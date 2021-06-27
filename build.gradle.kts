@@ -11,6 +11,9 @@ repositories {
     maven("https://hephaestus.dev/release") {
         name = "Haven's Maven"
     }
+    maven("https://maven.dblsaiko.net/") {
+        name = "2xsaiko's Maven"
+    }
 }
 
 dependencies {
@@ -21,6 +24,7 @@ dependencies {
     val flkVersion: String by project
     val geckolibVersion: String by project
     val rayonVersion: String by project
+    val hermesVersion: String by project
 
     minecraft("com.mojang:minecraft:$minecraftVersion")
     mappings("net.fabricmc:yarn:$yarnVersion:v2")
@@ -30,6 +34,8 @@ dependencies {
 
     modImplementation("net.fabricmc:fabric-language-kotlin:$flkVersion")
     modApi("software.bernie.geckolib:geckolib-fabric-1.17:$geckolibVersion:dev")
+    modApi("net.dblsaiko.rayon:rayon:$rayonVersion")
+    modRuntime("dev.inkwell:hermes:$hermesVersion")
 
 }
 
