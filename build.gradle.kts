@@ -6,15 +6,19 @@ plugins {
 }
 
 repositories {
-    maven("https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/") {
-        name = "GeckoLib"
+    maven("https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/") { name = "GeckoLib" }
+    maven("https://hephaestus.dev/release") { name = "Haven's Maven" }
+    maven("https://maven.dblsaiko.net/") { name = "2xsaiko's Maven" }
+
+    maven("https://maven.pkg.github.com/LambdAurora/LambDynamicLights") {
+        name = "LambDynamicLights"
+        credentials {
+            username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+            password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+        }
     }
-    maven("https://hephaestus.dev/release") {
-        name = "Haven's Maven"
-    }
-    maven("https://maven.dblsaiko.net/") {
-        name = "2xsaiko's Maven"
-    }
+    maven("https://maven.terraformersmc.com/releases/") { name = "Terraformers" }
+    maven("https://aperlambda.github.io/maven") { name = "AperLambda" }
 }
 
 dependencies {
@@ -44,6 +48,10 @@ dependencies {
     modApi("net.dblsaiko.rayon:rayon-core:$rayonVersion")
     modApi("net.dblsaiko.rayon:rayon-entity:$rayonVersion")
     modRuntime("dev.inkwell:hermes:$hermesVersion")
+
+    modImplementation("dev.lambdaurora:lambdynamiclights:2.0.1+1.17") {
+        exclude(group = "com.google.guava")
+    }
 
 }
 
