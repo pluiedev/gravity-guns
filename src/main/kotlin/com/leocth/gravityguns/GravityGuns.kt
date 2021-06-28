@@ -3,13 +3,19 @@ package com.leocth.gravityguns
 import com.leocth.gravityguns.data.GravityGunTags
 import com.leocth.gravityguns.entity.BlockAsAnEntity
 import com.leocth.gravityguns.item.GravityGunItem
+import com.leocth.gravityguns.physics.GrabbingManager
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.ServerStopped
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.item.Item
 import net.minecraft.item.ItemGroup
 import net.minecraft.item.ItemStack
+import net.minecraft.server.MinecraftServer
 import net.minecraft.util.Identifier
 import net.minecraft.util.registry.Registry
+
 
 @Suppress("UNUSED")
 object GravityGuns: ModInitializer {
@@ -23,6 +29,10 @@ object GravityGuns: ModInitializer {
 
         Registry.register(Registry.ITEM, id("gravity_gun"), GRAVITY_GUN)
         Registry.register(Registry.ENTITY_TYPE, id("block"), BlockAsAnEntity.TYPE)
+
+
+        ServerLifecycleEvents.SERVER_STOPPED.register { GrabbingManager.SERVER.instances.clear() }
+        ServerTickEvents.END_SERVER_TICK.register { GrabbingManager.SERVER.tick() }
     }
 
     val defaultSettings get() = Item.Settings().group(ITEM_GROUP)

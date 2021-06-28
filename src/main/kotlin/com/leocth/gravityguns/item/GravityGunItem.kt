@@ -1,20 +1,15 @@
 package com.leocth.gravityguns.item
 
-import com.leocth.gravityguns.entity.BlockAsAnEntity
 import com.leocth.gravityguns.physics.GrabUtil
 import com.leocth.gravityguns.physics.GrabbingManager
-import net.minecraft.block.BlockState
-import net.minecraft.entity.FallingBlockEntity
+import com.leocth.gravityguns.util.ext.toBullet
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtHelper
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.Hand
 import net.minecraft.util.TypedActionResult
-import net.minecraft.util.hit.HitResult
-import net.minecraft.world.RaycastContext
 import net.minecraft.world.World
 import software.bernie.geckolib3.core.IAnimatable
 import software.bernie.geckolib3.core.PlayState
@@ -25,19 +20,6 @@ import software.bernie.geckolib3.core.manager.AnimationFactory
 class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
     private val factory = AnimationFactory(this)
 
-    companion object {
-        fun getHeldBlock(stack: ItemStack): BlockState
-            = NbtHelper.toBlockState(stack.orCreateTag.getCompound("block"))
-        fun setHeldBlock(stack: ItemStack, value: BlockState) {
-            stack.orCreateTag.put("block", NbtHelper.fromBlockState(value))
-        }
-        fun hasHeldBlock(stack: ItemStack): Boolean = stack.orCreateTag.contains("block")
-        fun removeHeldBlock(stack: ItemStack) { stack.orCreateTag.remove("block") }
-
-        fun isUsing(stack: ItemStack): Boolean = stack.orCreateTag.getBoolean("isUsing")
-        fun setUsing(stack: ItemStack, value: Boolean) { stack.orCreateTag.putBoolean("isUsing", value) }
-    }
-
     override fun getMaxUseTime(stack: ItemStack): Int = 20000
 
     override fun onStoppedUsing(stack: ItemStack, world: World, user: LivingEntity, remainingUseTicks: Int) {
@@ -45,6 +27,12 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
             val grabbingManager = GrabbingManager.SERVER
 
             if (user is ServerPlayerEntity && grabbingManager.isPlayerGrabbing(user)) {
+                val instance = grabbingManager.instances[user.uuid]
+                instance?.let {
+                    val impulse = user.rotationVector.multiply(50.0).toBullet()
+                    it.grabbedBody.setLinearVelocity(impulse)
+                }
+
                 grabbingManager.tryUngrab(user, 0.0f)
             }
         }

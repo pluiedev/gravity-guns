@@ -12,6 +12,7 @@ import com.leocth.gravityguns.util.ext.toVec3d
 import dev.lazurite.rayon.core.api.event.collision.PhysicsSpaceEvents
 import dev.lazurite.rayon.core.impl.bullet.collision.space.MinecraftSpace
 import dev.lazurite.rayon.entity.api.EntityPhysicsElement
+import dev.lazurite.rayon.entity.impl.collision.body.EntityRigidBody
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.server.network.ServerPlayerEntity
@@ -24,7 +25,7 @@ import kotlin.random.Random
  * as I can't for the life of me figure it out on my own.
  */
 class GrabbingManager(val isServer: Boolean) {
-    private val instances = ConcurrentHashMap<UUID, Instance>()
+    val instances = ConcurrentHashMap<UUID, Instance>()
 
     init {
         PhysicsSpaceEvents.STEP.register(this::step)
@@ -34,13 +35,17 @@ class GrabbingManager(val isServer: Boolean) {
         // update grab point's location, to be in front of the player
         forEachInstance {
             it.grabbedBody.activate()
+
+            it.grabPoint.setGravity(Vector3f.ZERO)
             it.grabPoint.setPhysicsLocation(getTargetPos(it.owner))
+
+            println("phys location = ${it.grabPoint.getPhysicsLocation(null)}")
         }
     }
 
     private fun getTargetPos(owner: PlayerEntity): Vector3f
         = owner.getCameraPosVec(1f)
-            .add(owner.rotationVector.multiply(2.0))
+            .add(owner.rotationVector.multiply(3.0))
             .toBullet()
 
     fun tick() {
@@ -51,7 +56,8 @@ class GrabbingManager(val isServer: Boolean) {
                 tryUngrab(owner, 0.0f)
             }
 
-            if (grabbedBody is WrappedEntityRigidBody) {
+
+            if (grabbedBody is EntityRigidBody) {
                 val location = grabbedBody.getPhysicsLocation(null)
                 val yCenter = entity.boundingBox.yLength / 2.0
                 entity.updatePosition(
@@ -60,6 +66,7 @@ class GrabbingManager(val isServer: Boolean) {
                     location.z.toDouble()
                 )
             }
+            println("real location = ${entity.pos}")
         }
     }
 

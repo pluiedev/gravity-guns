@@ -37,7 +37,7 @@ object GravityGunsS2CPackets {
                 ?: throw IllegalStateException("cannot find entity with ID $entityId!")
 
             if (owner is PlayerEntity) {
-                GrabbingManager.SERVER.tryGrab(owner, entity)
+                GrabbingManager.CLIENT.tryGrab(owner, entity)
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.leocth.gravityguns.entity
 
 import com.jme3.math.Vector3f
+import com.leocth.gravityguns.physics.GrabbingManager
 import com.leocth.gravityguns.util.ext.getBlockState
 import com.leocth.gravityguns.util.ext.putBlockState
 import dev.lazurite.rayon.core.impl.bullet.collision.body.BlockRigidBody
@@ -28,6 +29,8 @@ class BlockAsAnEntity(world: World) : Entity(TYPE, world), EntityPhysicsElement 
 
     init {
         inanimate = true
+        rigidBody.dragCoefficient = 0.001f
+        rigidBody.mass = 5.0f
     }
 
     constructor(
@@ -65,7 +68,7 @@ class BlockAsAnEntity(world: World) : Entity(TYPE, world), EntityPhysicsElement 
     override fun getRigidBody() = rigidBody
 
     fun onBlockCollision(blockRigidBody: BlockRigidBody, impulse: Float) {
-        if (blockY - blockRigidBody.blockPos.y == 1) {
+        if (!GrabbingManager.SERVER.isEntityBeingGrabbed(this) && blockY - blockRigidBody.blockPos.y == 1) {
             world.setBlockState(blockPos, block)
             kill()
         }
