@@ -2,7 +2,9 @@ package com.leocth.gravityguns.physics
 
 import com.leocth.gravityguns.data.GravityGunTags
 import com.leocth.gravityguns.entity.BlockAsAnEntity
+import com.leocth.gravityguns.entity.CompactBlockStates
 import net.minecraft.block.BlockState
+import net.minecraft.block.Blocks
 import net.minecraft.block.PistonBlock
 import net.minecraft.block.PistonHeadBlock
 import net.minecraft.entity.Entity
@@ -41,12 +43,20 @@ object GrabUtil {
         if (result.type != HitResult.Type.MISS && result is BlockHitResult) {
             val blockPos = result.blockPos
             val state = world.getBlockState(blockPos)
+            val up = blockPos.up()
+            val above = world.getBlockState(up)
 
             if (isBlockImmobile(world, blockPos, state)) return null
+            if (isBlockImmobile(world, up, above)) return null
 
-            val bEntity = BlockAsAnEntity(world, blockPos.x + 0.5, blockPos.y.toDouble(), blockPos.z + 0.5, state)
+            val bEntity = BlockAsAnEntity(
+                world,
+                Vec3d.ofBottomCenter(blockPos),
+                CompactBlockStates(1, 1, 2, BlockPos.ORIGIN, state, above)
+            )
             world.spawnEntity(bEntity)
             world.removeBlock(blockPos, false)
+            world.removeBlock(up, false)
             return bEntity
         }
         return null

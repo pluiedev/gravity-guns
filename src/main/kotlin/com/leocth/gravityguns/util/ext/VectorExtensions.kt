@@ -5,6 +5,7 @@ import com.jme3.math.Vector3f
 import dev.lazurite.rayon.core.impl.bullet.math.VectorHelper
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.math.Vec3f
+import net.minecraft.util.math.Vec3i
 
 // Kotlin-friendly version of VectorHelper. All inlined, of course.
 
@@ -29,3 +30,7 @@ operator fun Vec3d.component3() = z
 operator fun Vector3f.component1() = x
 operator fun Vector3f.component2() = y
 operator fun Vector3f.component3() = z
+
+operator fun Vec3i.component1(): Int = x
+operator fun Vec3i.component2(): Int = y
+operator fun Vec3i.component3(): Int = z

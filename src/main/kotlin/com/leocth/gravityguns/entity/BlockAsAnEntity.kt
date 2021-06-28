@@ -2,9 +2,7 @@ package com.leocth.gravityguns.entity
 
 import com.jme3.math.Vector3f
 import com.leocth.gravityguns.physics.GrabbingManager
-import com.leocth.gravityguns.util.ext.getBlockState
-import com.leocth.gravityguns.util.ext.putBlockState
-import com.leocth.gravityguns.util.ext.toVec3d
+import com.leocth.gravityguns.util.ext.*
 import dev.lazurite.rayon.core.impl.bullet.collision.body.BlockRigidBody
 import dev.lazurite.rayon.core.impl.bullet.collision.space.MinecraftSpace
 import dev.lazurite.rayon.entity.api.EntityPhysicsElement
@@ -16,20 +14,26 @@ import net.minecraft.block.Blocks
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityDimensions
 import net.minecraft.entity.EntityType
+import net.minecraft.entity.data.DataTracker
+import net.minecraft.entity.data.TrackedDataHandlerRegistry
 import net.minecraft.fluid.Fluids
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.Packet
+import net.minecraft.network.PacketByteBuf
+import net.minecraft.network.listener.ClientPlayPacketListener
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 
 class BlockAsAnEntity(
     world: World,
-    val renderingSeed: Long = 114514
 ) : Entity(TYPE, world), EntityPhysicsElement {
-    var state: BlockState = Blocks.AIR.defaultState
-        private set
     private val rigidBody = EntityRigidBody(this)
+
+    var states: CompactBlockStates
+        get() = dataTracker.get(BLOCK_STATES)
+        private set(value) { dataTracker.set(BLOCK_STATES, value) }
 
     init {
         inanimate = true
@@ -39,30 +43,22 @@ class BlockAsAnEntity(
 
     constructor(
         world: World,
-        x: Double, y: Double, z: Double,
-        state: BlockState
-    ): this(world, state.getRenderingSeed(BlockPos(x, y, z))) {
-        setPosition(x, y + (1f - height) / 2.0, z)
-        this.state = state
+        pos: Vec3d,
+        states: CompactBlockStates
+    ): this(world) {
+        setPosition(pos.x, pos.y + (1f - height) / 2.0, pos.z)
+        this.states = states
     }
 
-    override fun initDataTracker() {}
-
-    override fun readCustomDataFromNbt(nbt: NbtCompound) {
-        state = nbt.getBlockState("block")
+    override fun initDataTracker() {
+        dataTracker.startTracking(BLOCK_STATES, CompactBlockStates.makeEmpty())
     }
 
-    override fun writeCustomDataToNbt(nbt: NbtCompound) {
-        nbt.putBlockState("block", state)
-    }
+    override fun readCustomDataFromNbt(nbt: NbtCompound) {}
+    override fun writeCustomDataToNbt(nbt: NbtCompound) {}
 
     override fun createSpawnPacket(): Packet<*>
-        = EntitySpawnS2CPacket(this, Block.getRawIdFromState(state))
-
-    override fun onSpawnPacket(packet: EntitySpawnS2CPacket) {
-        super.onSpawnPacket(packet)
-        state = Block.getStateFromRawId(packet.entityData)
-    }
+        = EntitySpawnS2CPacket(this)
 
     override fun step(space: MinecraftSpace) {
         rigidBody.applyCentralForce(Vector3f(0f, 9f, 0f))
@@ -71,6 +67,8 @@ class BlockAsAnEntity(
     override fun getRigidBody() = rigidBody
 
     fun onBlockCollision(blockRigidBody: BlockRigidBody, impulse: Float) {
+        // TODO
+        /*
         if (world.isClient || isRemoved) return
         if (GrabbingManager.SERVER.isEntityBeingGrabbed(this)) return // don't settle if it's still being grabbed
 
@@ -87,9 +85,12 @@ class BlockAsAnEntity(
             world.breakBlock(physPos, true)
             world.setBlockState(physPos, state)
         }
+         */
     }
 
     companion object {
+        private val BLOCK_STATES = DataTracker.registerData(BlockAsAnEntity::class.java, CompactBlockStates.DATA_HANDLER)
+
         val TYPE: EntityType<BlockAsAnEntity> = FabricEntityTypeBuilder.create<BlockAsAnEntity>()
             .dimensions(EntityDimensions.fixed(1f, 1f))
             .entityFactory { _: EntityType<BlockAsAnEntity>, world -> BlockAsAnEntity(world) }

@@ -2,6 +2,7 @@ package com.leocth.gravityguns
 
 import com.leocth.gravityguns.data.GravityGunTags
 import com.leocth.gravityguns.entity.BlockAsAnEntity
+import com.leocth.gravityguns.entity.CompactBlockStates
 import com.leocth.gravityguns.item.GravityGunItem
 import com.leocth.gravityguns.physics.GrabbingManager
 import net.fabricmc.api.ModInitializer
@@ -9,6 +10,7 @@ import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.ServerStopped
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
+import net.minecraft.entity.data.TrackedDataHandlerRegistry
 import net.minecraft.item.Item
 import net.minecraft.item.ItemGroup
 import net.minecraft.item.ItemStack
@@ -30,6 +32,7 @@ object GravityGuns: ModInitializer {
         Registry.register(Registry.ITEM, id("gravity_gun"), GRAVITY_GUN)
         Registry.register(Registry.ENTITY_TYPE, id("block"), BlockAsAnEntity.TYPE)
 
+        TrackedDataHandlerRegistry.register(CompactBlockStates.DATA_HANDLER)
 
         ServerLifecycleEvents.SERVER_STOPPED.register { GrabbingManager.SERVER.instances.clear() }
         ServerTickEvents.END_SERVER_TICK.register { GrabbingManager.SERVER.tick() }
