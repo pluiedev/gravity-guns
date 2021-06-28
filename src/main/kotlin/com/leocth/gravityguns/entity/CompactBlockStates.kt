@@ -60,6 +60,21 @@ class CompactBlockStates(
         }
     }
 
+    inline fun forEach(action: (x: Int, y: Int, z: Int, pos: BlockPos, state: BlockState) -> Unit) {
+        val pos = offset.mutableCopy()
+        for (x in 0 until length) {
+            for (z in 0 until width) {
+                for (y in 0 until height) {
+                    val state = this[x, y, z]
+                    action(x, y, z, pos, state)
+                    pos.y++
+                }
+                pos.z++
+            }
+            pos.x++
+        }
+    }
+
     fun indexAt(x: Int, y: Int, z: Int): Int
         = x + z * length + y * length * width
 

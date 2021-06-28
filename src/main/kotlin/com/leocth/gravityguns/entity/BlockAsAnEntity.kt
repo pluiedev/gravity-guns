@@ -67,8 +67,6 @@ class BlockAsAnEntity(
     override fun getRigidBody() = rigidBody
 
     fun onBlockCollision(blockRigidBody: BlockRigidBody, impulse: Float) {
-        // TODO
-        /*
         if (world.isClient || isRemoved) return
         if (GrabbingManager.SERVER.isEntityBeingGrabbed(this)) return // don't settle if it's still being grabbed
 
@@ -82,10 +80,18 @@ class BlockAsAnEntity(
         if (hasSpace) {
             rigidBody.setDoTerrainLoading(false)
             kill()
-            world.breakBlock(physPos, true)
-            world.setBlockState(physPos, state)
+
+            val mutablePhysPos = physPos.mutableCopy()
+            val states = this.states
+            states.forEach { _, _, _, pos, state ->
+                mutablePhysPos.move(pos)
+                world.breakBlock(mutablePhysPos, true)
+                world.setBlockState(mutablePhysPos, state)
+                mutablePhysPos.set(physPos)
+            }
+
+
         }
-         */
     }
 
     companion object {

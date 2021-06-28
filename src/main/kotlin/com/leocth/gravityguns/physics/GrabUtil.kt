@@ -45,18 +45,22 @@ object GrabUtil {
             val state = world.getBlockState(blockPos)
             val up = blockPos.up()
             val above = world.getBlockState(up)
+            val uper = up.up()
+            val abover = world.getBlockState(uper)
 
             if (isBlockImmobile(world, blockPos, state)) return null
             if (isBlockImmobile(world, up, above)) return null
+            if (isBlockImmobile(world, uper, abover)) return null
 
             val bEntity = BlockAsAnEntity(
                 world,
                 Vec3d.ofBottomCenter(blockPos),
-                CompactBlockStates(1, 1, 2, BlockPos.ORIGIN, state, above)
+                CompactBlockStates(1, 1, 3, BlockPos.ORIGIN, state, above, abover)
             )
             world.spawnEntity(bEntity)
             world.removeBlock(blockPos, false)
             world.removeBlock(up, false)
+            world.removeBlock(uper, false)
             return bEntity
         }
         return null

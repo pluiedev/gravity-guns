@@ -39,38 +39,28 @@ class BlockAsAnEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRender
         val blockRenderManager = MinecraftClient.getInstance().blockRenderManager
 
         // TODO: this is horrible for performance. use a baked model.
-        for (x in 0 until states.length) {
-            for (y in 0 until states.height) {
-                for (z in 0 until states.width) {
-                    val state = states[x, y, z]
+        states.forEach { _, _, _, pos, state ->
+            if (state.renderType == BlockRenderType.MODEL) {
+                matrices.frame {
+                    it.translate(-0.5, -0.5, -0.5)
+                    it.translate(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())
+                    blockRenderManager.modelRenderer.render(
+                        world,
+                        blockRenderManager.getModel(state),
+                        state,
+                        blockPos,
+                        it,
+                        vertexConsumers.getBuffer(RenderLayers.getMovingBlockLayer(state)),
+                        false,
+                        world.random,
+                        114514, // TODO
+                        OverlayTexture.DEFAULT_UV
+                    )
 
-                    if (state.renderType == BlockRenderType.MODEL) {
-                        matrices.frame {
-                            it.translate(-0.5, -0.5, -0.5)
-                            it.translate((x - oX).toDouble(), (y - oY).toDouble(), (z - oZ).toDouble())
-                            blockRenderManager.modelRenderer.render(
-                                world,
-                                blockRenderManager.getModel(state),
-                                state,
-                                blockPos,
-                                it,
-                                vertexConsumers.getBuffer(RenderLayers.getMovingBlockLayer(state)),
-                                false,
-                                world.random,
-                                114514, // TODO
-                                OverlayTexture.DEFAULT_UV
-                            )
-
-                        }
-                        super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light)
-                    }
                 }
+                super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light)
             }
         }
-        /*
-
-
-         */
     }
 
     @Suppress("DEPRECATION")
