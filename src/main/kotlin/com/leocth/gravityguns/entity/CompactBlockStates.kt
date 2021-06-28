@@ -3,7 +3,6 @@ package com.leocth.gravityguns.entity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.entity.data.TrackedDataHandler
-import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.util.math.BlockPos
 

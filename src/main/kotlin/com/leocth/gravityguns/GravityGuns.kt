@@ -18,7 +18,6 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.util.Identifier
 import net.minecraft.util.registry.Registry
 
-
 @Suppress("UNUSED")
 object GravityGuns: ModInitializer {
     const val MOD_ID = "gravityguns"

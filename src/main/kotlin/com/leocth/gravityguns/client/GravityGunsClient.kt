@@ -17,7 +17,6 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.world.ClientWorld
 import software.bernie.geckolib3.renderers.geo.GeoItemRenderer
 
-
 @Suppress("UNUSED")
 @Environment(EnvType.CLIENT)
 object GravityGunsClient: ClientModInitializer {
