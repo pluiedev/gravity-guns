@@ -42,13 +42,11 @@ object GrabUtil {
             val blockPos = result.blockPos
             val state = world.getBlockState(blockPos)
 
-
             if (isBlockImmobile(world, blockPos, state)) return null
 
             val bEntity = BlockAsAnEntity(world, blockPos.x + 0.5, blockPos.y.toDouble(), blockPos.z + 0.5, state)
-            world.removeBlock(blockPos, false)
-
             world.spawnEntity(bEntity)
+            world.removeBlock(blockPos, false)
             return bEntity
         }
         return null

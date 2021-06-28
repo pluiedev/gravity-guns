@@ -28,7 +28,7 @@ class BlockAsAnEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRender
         vertexConsumers: VertexConsumerProvider,
         light: Int
     ) {
-        val state = entity.block
+        val state = entity.state
         if (state.renderType == BlockRenderType.MODEL) {
             val world = entity.world
             val blockPos = BlockPos(entity.x, entity.boundingBox.maxY, entity.z)
