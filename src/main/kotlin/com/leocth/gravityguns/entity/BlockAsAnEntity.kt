@@ -33,17 +33,10 @@ class BlockAsAnEntity(world: World) : Entity(TYPE, world), EntityPhysicsElement 
     constructor(
         world: World,
         x: Double, y: Double, z: Double,
-        player: PlayerEntity,
         state: BlockState
     ): this(world) {
         setPosition(x, y + (1f - height) / 2.0, z)
         block = state
-        PhysicsThread.get(world).execute {
-            val reverse = player.rotationVector.negate()
-            rigidBody.applyCentralImpulse(Vector3f((reverse.x * 5f).toFloat(), (reverse.y * 5f).toFloat(),
-                (reverse.z * 5f).toFloat()
-            ))
-        }
     }
 
     override fun initDataTracker() {}

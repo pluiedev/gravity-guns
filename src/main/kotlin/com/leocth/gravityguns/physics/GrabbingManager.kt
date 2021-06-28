@@ -79,7 +79,8 @@ class GrabbingManager(val isServer: Boolean) {
         }
 
         val targetPos = getTargetPos(owner)
-        // WTF?
+
+        // Wut?
         val holdBody = PhysicsRigidBody(EMPTY_SHAPE, 0f)
         holdBody.setPhysicsLocation(targetPos)
 

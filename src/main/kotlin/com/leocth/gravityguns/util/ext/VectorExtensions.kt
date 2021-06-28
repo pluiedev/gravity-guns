@@ -18,3 +18,14 @@ inline fun Vector3f.toVec3f(): Vec3f
 inline fun Vector3f.toVec3d(): Vec3d
     = Vec3d(x.toDouble(), y.toDouble(), z.toDouble())
 
+operator fun Vec3f.component1() = x
+operator fun Vec3f.component2() = y
+operator fun Vec3f.component3() = z
+
+operator fun Vec3d.component1() = x
+operator fun Vec3d.component2() = y
+operator fun Vec3d.component3() = z
+
+operator fun Vector3f.component1() = x
+operator fun Vector3f.component2() = y
+operator fun Vector3f.component3() = z
