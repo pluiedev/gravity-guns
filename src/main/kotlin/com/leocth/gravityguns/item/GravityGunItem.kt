@@ -1,6 +1,8 @@
 package com.leocth.gravityguns.item
 
 import com.leocth.gravityguns.entity.BlockAsAnEntity
+import com.leocth.gravityguns.physics.GrabUtil
+import com.leocth.gravityguns.physics.GrabbingManager
 import net.minecraft.block.BlockState
 import net.minecraft.entity.FallingBlockEntity
 import net.minecraft.entity.LivingEntity
@@ -8,6 +10,7 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtHelper
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.Hand
 import net.minecraft.util.TypedActionResult
 import net.minecraft.util.hit.HitResult
@@ -39,49 +42,27 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
 
     override fun onStoppedUsing(stack: ItemStack, world: World, user: LivingEntity, remainingUseTicks: Int) {
         if (!world.isClient) {
-            /*
-            if (hasHeldBlock(stack)) {
-                // yeet it
-                val state = getHeldBlock(stack)
-                val fallingBlockEntity = FallingBlockEntity(world, user.x, user.eyeY - 0.1, user.z, state)
-                fallingBlockEntity.timeFalling = 1 // trick MC's verification process
-                fallingBlockEntity.velocity = user.rotationVector.multiply(4.0)
-                world.spawnEntity(fallingBlockEntity)
+            val grabbingManager = GrabbingManager.SERVER
 
-                removeHeldBlock(stack)
-                if (user is PlayerEntity)
-                    user.itemCooldownManager.set(this, 10)
-
-                setUsing(stack, false)
+            if (user is ServerPlayerEntity && grabbingManager.isPlayerGrabbing(user)) {
+                grabbingManager.tryUngrab(user, 0.0f)
             }
-
-             */
         }
     }
 
     override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
         if (!world.isClient) {
             val stack = user.getStackInHand(hand)
-            if (isUsing(stack)) return TypedActionResult.pass(stack)
 
-            val end = user.eyePos.add(user.rotationVector.multiply(8.0))
-            val rayCtx = RaycastContext(
-                /*start = */ user.eyePos,
-                /*end = */ end,
-                /*shapeType = */ RaycastContext.ShapeType.COLLIDER,
-                /*fluidHandling = */ RaycastContext.FluidHandling.ANY,
-                /*entity = */ user
-            )
-            val hit = world.raycast(rayCtx)
+            val grabbingManager = GrabbingManager.SERVER
 
-            if (hit.type == HitResult.Type.BLOCK) {
-                val blockState = world.getBlockState(hit.blockPos)
-                world.removeBlock(hit.blockPos, true)
+            if (!grabbingManager.isPlayerGrabbing(user)) {
+                val thingToGrab =
+                    GrabUtil.getEntityToGrab(user, 7.0) ?:
+                    GrabUtil.getBlockToGrab(user, 8.0) ?:
+                    return TypedActionResult.fail(stack)
 
-                val blockPos = hit.blockPos
-                val entity = BlockAsAnEntity(world, blockPos.x + 0.5, blockPos.y.toDouble(), blockPos.z + 0.5, user, blockState)
-                world.spawnEntity(entity)
-
+                grabbingManager.tryGrab(user, thingToGrab)
                 user.setCurrentHand(hand)
                 return TypedActionResult.consume(stack)
             }

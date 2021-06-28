@@ -64,7 +64,7 @@ class GrabbingManager(val isServer: Boolean) {
     }
 
     fun tryGrab(owner: PlayerEntity, entity: Entity) {
-        if (owner.isGrabbing || entity.isGrabbed) return
+        if (isPlayerGrabbing(owner) || isEntityBeingGrabbed(entity)) return
 
         if (owner is ServerPlayerEntity) {
             GravityGunsS2CPackets.sendGrabPacket(owner, entity)
@@ -150,9 +150,8 @@ class GrabbingManager(val isServer: Boolean) {
         }
     }
 
-
-    private val PlayerEntity.isGrabbing get() = instances.containsKey(uuid)
-    private val Entity.isGrabbed get() = instances.any { it.value.entity == this }
+    fun isPlayerGrabbing(player: PlayerEntity) = instances.containsKey(player.uuid)
+    fun isEntityBeingGrabbed(entity: Entity) = instances.any { it.value.entity == entity }
 
     @Suppress("NOTHING_TO_INLINE")
     private inline fun forEachInstance(noinline action: (Instance) -> Unit) {
