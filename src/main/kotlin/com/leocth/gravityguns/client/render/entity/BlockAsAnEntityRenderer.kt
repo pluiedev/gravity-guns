@@ -33,6 +33,9 @@ class BlockAsAnEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRender
             val world = entity.world
             val blockPos = BlockPos(entity.x, entity.boundingBox.maxY, entity.z)
             val blockRenderManager = MinecraftClient.getInstance().blockRenderManager
+
+
+
             matrices.frame {
                 it.translate(-0.5, -0.5, -0.5)
                 blockRenderManager.modelRenderer.render(
@@ -44,7 +47,7 @@ class BlockAsAnEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRender
                     vertexConsumers.getBuffer(RenderLayers.getMovingBlockLayer(state)),
                     false,
                     world.random,
-                    state.getRenderingSeed(entity.blockPos),
+                    entity.renderingSeed,
                     OverlayTexture.DEFAULT_UV
                 )
 

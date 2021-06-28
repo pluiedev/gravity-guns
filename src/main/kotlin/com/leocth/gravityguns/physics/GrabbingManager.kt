@@ -4,6 +4,7 @@ import com.jme3.bullet.collision.shapes.EmptyShape
 import com.jme3.bullet.joints.SixDofSpringJoint
 import com.jme3.bullet.objects.PhysicsRigidBody
 import com.jme3.math.Matrix3f
+import com.jme3.math.Quaternion
 import com.jme3.math.Vector3f
 import com.leocth.gravityguns.GravityGuns
 import com.leocth.gravityguns.network.GravityGunsS2CPackets
@@ -36,16 +37,13 @@ class GrabbingManager(val isServer: Boolean) {
         forEachInstance {
             it.grabbedBody.activate()
 
-            it.grabPoint.setGravity(Vector3f.ZERO)
             it.grabPoint.setPhysicsLocation(getTargetPos(it.owner))
-
-            println("phys location = ${it.grabPoint.getPhysicsLocation(null)}")
         }
     }
 
     private fun getTargetPos(owner: PlayerEntity): Vector3f
         = owner.getCameraPosVec(1f)
-            .add(owner.rotationVector.multiply(3.0))
+            .add(owner.rotationVector.multiply(3.5))
             .toBullet()
 
     fun tick() {
@@ -66,7 +64,6 @@ class GrabbingManager(val isServer: Boolean) {
                     location.z.toDouble()
                 )
             }
-            println("real location = ${entity.pos}")
         }
     }
 

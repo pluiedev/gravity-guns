@@ -20,16 +20,20 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.Packet
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
+import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
-class BlockAsAnEntity(world: World) : Entity(TYPE, world), EntityPhysicsElement {
+class BlockAsAnEntity(
+    world: World,
+    val renderingSeed: Long = 114514
+) : Entity(TYPE, world), EntityPhysicsElement {
     var block: BlockState = Blocks.AIR.defaultState
         private set
     private val rigidBody = EntityRigidBody(this)
 
     init {
         inanimate = true
-        rigidBody.dragCoefficient = 0.001f
+        rigidBody.dragCoefficient = 0.0005f
         rigidBody.mass = 5.0f
     }
 
@@ -37,7 +41,7 @@ class BlockAsAnEntity(world: World) : Entity(TYPE, world), EntityPhysicsElement 
         world: World,
         x: Double, y: Double, z: Double,
         state: BlockState
-    ): this(world) {
+    ): this(world, state.getRenderingSeed(BlockPos(x, y, z))) {
         setPosition(x, y + (1f - height) / 2.0, z)
         block = state
     }
