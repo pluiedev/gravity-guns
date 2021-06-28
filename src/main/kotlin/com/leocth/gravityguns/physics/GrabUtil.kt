@@ -21,7 +21,7 @@ object GrabUtil {
         val box = user.boundingBox.stretch(extended).expand(1.0)
 
         val result = raycastEntity(user, cameraPos, end, box, reach) {
-            it.type !in GravityGunTags.GRABBABLE_ENTITIES
+            it.type !in GravityGunTags.IMMOBILE_ENTITIES
         } ?: return null
 
         return result.entity?.let {
@@ -43,11 +43,13 @@ object GrabUtil {
             // 3) it cannot be denied by the deny list
             if (state.block.canMobSpawnInside() ||
                 world.getBlockEntity(blockPos) != null ||
-                state.block in GravityGunTags.GRABBABLE_BLOCKS
+                state.block in GravityGunTags.IMMOBILE_BLOCKS
             ) return null
 
             val bEntity = BlockAsAnEntity(world, blockPos.x + 0.5, blockPos.y.toDouble(), blockPos.z + 0.5, state)
             world.removeBlock(blockPos, false)
+
+            world.spawnEntity(bEntity)
             return bEntity
         }
         return null
