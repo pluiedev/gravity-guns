@@ -79,7 +79,7 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
                 world.removeBlock(hit.blockPos, true)
 
                 val blockPos = hit.blockPos
-                val entity = BlockAsAnEntity(world, blockPos.x + 0.5, blockPos.y.toDouble(), blockPos.z + 0.5)
+                val entity = BlockAsAnEntity(world, blockPos.x + 0.5, blockPos.y.toDouble(), blockPos.z + 0.5, user, blockState)
                 world.spawnEntity(entity)
 
                 user.setCurrentHand(hand)

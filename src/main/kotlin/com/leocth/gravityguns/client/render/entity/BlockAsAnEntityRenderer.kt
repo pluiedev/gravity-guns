@@ -34,7 +34,7 @@ class BlockAsAnEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRender
             val blockPos = BlockPos(entity.x, entity.boundingBox.maxY, entity.z)
             val blockRenderManager = MinecraftClient.getInstance().blockRenderManager
             matrices.frame {
-                it.translate(-0.5, 0.0, -0.5)
+                it.translate(-0.5, -0.5, -0.5)
                 blockRenderManager.modelRenderer.render(
                     world,
                     blockRenderManager.getModel(state),
