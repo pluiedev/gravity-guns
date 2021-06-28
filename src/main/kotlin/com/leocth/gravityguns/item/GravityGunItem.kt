@@ -29,7 +29,7 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
             if (user is ServerPlayerEntity && grabbingManager.isPlayerGrabbing(user)) {
                 val instance = grabbingManager.instances[user.uuid]
                 instance?.let {
-                    val impulse = user.rotationVector.multiply(40.0).toBullet()
+                    val impulse = user.rotationVector.multiply(20.0).toBullet()
                     it.grabbedBody.setLinearVelocity(impulse)
                 }
 

@@ -1,6 +1,7 @@
 {
     "replace": false,
     "values": [
-        "#minecraft:wither_immune"
+        "#minecraft:wither_immune",
+        "minecraft:piston_head"
     ]
 }

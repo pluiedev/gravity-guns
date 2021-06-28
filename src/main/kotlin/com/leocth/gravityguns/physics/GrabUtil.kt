@@ -2,13 +2,18 @@ package com.leocth.gravityguns.physics
 
 import com.leocth.gravityguns.data.GravityGunTags
 import com.leocth.gravityguns.entity.BlockAsAnEntity
+import net.minecraft.block.BlockState
+import net.minecraft.block.PistonBlock
+import net.minecraft.block.PistonHeadBlock
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.EntityHitResult
 import net.minecraft.util.hit.HitResult
+import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
+import net.minecraft.world.World
 
 // Shamelessly stolen from Thinking with Portatos
 object GrabUtil {
@@ -37,14 +42,8 @@ object GrabUtil {
             val blockPos = result.blockPos
             val state = world.getBlockState(blockPos)
 
-            // filtering blocks that cannot be grabbed:
-            // 1) it cannot allow mobs to spawn inside, i.e. air & cave air
-            // 2) it cannot house block entities, since block entity logic is tricky (although TODO I can add this later...?)
-            // 3) it cannot be denied by the deny list
-            if (state.block.canMobSpawnInside() ||
-                world.getBlockEntity(blockPos) != null ||
-                state.block in GravityGunTags.IMMOBILE_BLOCKS
-            ) return null
+
+            if (isBlockImmobile(world, blockPos, state)) return null
 
             val bEntity = BlockAsAnEntity(world, blockPos.x + 0.5, blockPos.y.toDouble(), blockPos.z + 0.5, state)
             world.removeBlock(blockPos, false)
@@ -61,7 +60,7 @@ object GrabUtil {
         since decompiler artifacts (such as the iterator raw loop and nondescript locals) are present.
         I think I should be allowed to use this.
      */
-    fun raycastEntity(
+    private fun raycastEntity(
         self: Entity,
         start: Vec3d,
         end: Vec3d,
@@ -109,4 +108,19 @@ object GrabUtil {
         if (entity == null) return null
         return EntityHitResult(entity, hit)
     }
+
+    // filtering blocks that cannot be grabbed:
+    // 1) it cannot allow mobs to spawn inside, i.e. air & cave air
+    // 2) it cannot house block entities, since block entity logic is tricky (although TODO I can add this later...?)
+    // 3) it cannot be denied by the deny list
+
+    // TODO: allow moving multiple blocks: could be useful when moving double blocks such as doors, or moving multiple blocks as a cluster
+    private fun isBlockImmobile(world: World, pos: BlockPos, state: BlockState): Boolean
+            = state.block.canMobSpawnInside() ||
+            world.getBlockEntity(pos) != null ||
+            state.block in GravityGunTags.IMMOBILE_BLOCKS ||
+            (
+                state.block is PistonBlock &&
+                state.get(PistonBlock.EXTENDED) // disallow extended pistons
+            )
 }

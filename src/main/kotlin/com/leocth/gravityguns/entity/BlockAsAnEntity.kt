@@ -72,6 +72,7 @@ class BlockAsAnEntity(
     override fun getRigidBody() = rigidBody
 
     fun onBlockCollision(blockRigidBody: BlockRigidBody, impulse: Float) {
+        // TODO: ignore if block below is a fluid block
         if (!GrabbingManager.SERVER.isEntityBeingGrabbed(this) && blockY - blockRigidBody.blockPos.y == 1) {
             world.setBlockState(blockPos, block)
             kill()
