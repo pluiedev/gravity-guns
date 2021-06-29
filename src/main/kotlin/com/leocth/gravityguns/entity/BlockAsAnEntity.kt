@@ -4,6 +4,7 @@ import com.jme3.math.Vector3f
 import com.leocth.gravityguns.physics.GrabbingManager
 import com.leocth.gravityguns.util.ext.*
 import dev.lazurite.rayon.core.impl.bullet.collision.body.BlockRigidBody
+import dev.lazurite.rayon.core.impl.bullet.collision.body.shape.MinecraftShape
 import dev.lazurite.rayon.core.impl.bullet.collision.space.MinecraftSpace
 import dev.lazurite.rayon.entity.api.EntityPhysicsElement
 import dev.lazurite.rayon.entity.impl.collision.body.EntityRigidBody
@@ -13,6 +14,7 @@ import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityDimensions
+import net.minecraft.entity.EntityPose
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.data.DataTracker
 import net.minecraft.entity.data.TrackedDataHandlerRegistry
@@ -23,6 +25,7 @@ import net.minecraft.network.PacketByteBuf
 import net.minecraft.network.listener.ClientPlayPacketListener
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 
@@ -46,6 +49,7 @@ class BlockAsAnEntity(
         pos: Vec3d,
         states: CompactBlockStates
     ): this(world) {
+        rigidBody.collisionShape = MinecraftShape.of(states.boundingBox)
         setPosition(pos.x, pos.y + (1f - height) / 2.0, pos.z)
         this.states = states
     }
@@ -61,7 +65,7 @@ class BlockAsAnEntity(
         = EntitySpawnS2CPacket(this)
 
     override fun step(space: MinecraftSpace) {
-        rigidBody.applyCentralForce(Vector3f(0f, 9f, 0f))
+        //rigidBody.applyCentralForce(Vector3f(0f, 9f, 0f))
     }
 
     override fun getRigidBody() = rigidBody
@@ -84,6 +88,8 @@ class BlockAsAnEntity(
             val mutablePhysPos = physPos.mutableCopy()
             val states = this.states
             states.forEach { _, _, _, pos, state ->
+                if (state.isAir) return@forEach
+
                 mutablePhysPos.move(pos)
                 world.breakBlock(mutablePhysPos, true)
                 world.setBlockState(mutablePhysPos, state)

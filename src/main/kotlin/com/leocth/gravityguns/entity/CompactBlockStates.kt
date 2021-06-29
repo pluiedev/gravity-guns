@@ -5,6 +5,7 @@ import net.minecraft.block.BlockState
 import net.minecraft.entity.data.TrackedDataHandler
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Box
 
 class CompactBlockStates(
     length: Int,
@@ -24,16 +25,7 @@ class CompactBlockStates(
         private set
 
     val size: Int get() = blockStates.size
-
-    constructor(
-        length: Int,
-        width: Int,
-        height: Int,
-        offset: BlockPos,
-        vararg blockStates: BlockState
-    ): this(length, width, height, offset,
-        IntArray(length * width * height) { Block.getRawIdFromState(blockStates[it]) }
-    )
+    val boundingBox: Box get() = Box(offset, offset.add(length - 1, height - 1, width - 1))
 
     init {
         require(length * width * height == size)
