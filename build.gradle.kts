@@ -21,6 +21,8 @@ repositories {
     maven("https://maven.terraformersmc.com/releases/") { name = "Terraformers" }
     maven("https://aperlambda.github.io/maven") { name = "AperLambda" }
     maven("https://maven.shedaniel.me/") { name = "shedaniel's Maven" }
+
+    mavenLocal()
 }
 
 dependencies {
@@ -32,6 +34,7 @@ dependencies {
     val geckolibVersion: String by project
     val clothConfigLiteVersion: String by project
     val modMenuVersion: String by project
+    val rayonVersion: String by project
 
     minecraft("com.mojang:minecraft:$minecraftVersion")
     mappings("net.fabricmc:yarn:$yarnVersion:v2")
@@ -39,7 +42,6 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fapiVersion")
     modImplementation("net.fabricmc:fabric-language-kotlin:$flkVersion")
 
-    rayon()
     modApi("software.bernie.geckolib:geckolib-fabric-1.17:$geckolibVersion:dev")
     modImplementation("dev.lambdaurora:lambdynamiclights:2.0.1+1.17") {
         exclude(group = "com.google.guava") // takes ages to download and ultimately isn't vital
@@ -52,20 +54,7 @@ dependencies {
     modRuntime("com.terraformersmc:modmenu:$modMenuVersion") {
         isTransitive = false
     }
-}
-
-fun DependencyHandlerScope.rayon() {
-    val rayonVersion: String by project
-    val hermesVersion: String by project
-    val libbulletjmeVersion: String by project
-
-    // FIXME: 2xsaiko's fat dep (i.e. net.dblsaiko.rayon:rayon) doesn't show up correctly as separate modules in IDEA.
-    implementation("com.github.stephengold:Libbulletjme:$libbulletjmeVersion")
-    shadow("com.github.stephengold:Libbulletjme:$libbulletjmeVersion")
-
-    modApi("net.dblsaiko.rayon:rayon-core:$rayonVersion")
-    modApi("net.dblsaiko.rayon:rayon-entity:$rayonVersion")
-    modRuntime("dev.inkwell:hermes:$hermesVersion")
+    modApi("net.dblsaiko.rayon:rayon:$rayonVersion")
 }
 
 java {
