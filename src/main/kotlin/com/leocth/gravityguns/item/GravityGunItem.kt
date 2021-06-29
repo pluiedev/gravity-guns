@@ -53,7 +53,7 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
             if (!grabbingManager.isPlayerGrabbing(user)) {
                 val thingToGrab =
                     GrabUtil.getEntityToGrab(user, 7.0) ?:
-                    GrabUtil.getBlockToGrab(user, 8.0) ?:
+                    GrabUtil.getBlockToGrab(user, 8.0, stack.power) ?:
                     return TypedActionResult.fail(stack)
 
                 grabbingManager.tryGrab(user, thingToGrab)

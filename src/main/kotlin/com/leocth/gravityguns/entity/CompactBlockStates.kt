@@ -64,13 +64,12 @@ class CompactBlockStates(
         for (x in 0 until length) {
             for (z in 0 until width) {
                 for (y in 0 until height) {
+                    pos.move(x, y, z)
                     val state = this[x, y, z]
                     action(x, y, z, pos, state)
-                    pos.y++
+                    pos.set(offset)
                 }
-                pos.z++
             }
-            pos.x++
         }
     }
 

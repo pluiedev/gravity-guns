@@ -32,7 +32,6 @@ class BlockAsAnEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRender
         light: Int
     ) {
         val states = entity.states
-        val (oX, oY, oZ) = states.offset
 
         val world = entity.world
         val blockPos = BlockPos(entity.x, entity.boundingBox.maxY, entity.z)

@@ -4,9 +4,6 @@ import com.leocth.gravityguns.data.GravityGunTags
 import com.leocth.gravityguns.entity.BlockAsAnEntity
 import com.leocth.gravityguns.entity.CompactBlockStates
 import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
-import net.minecraft.block.PistonBlock
-import net.minecraft.block.PistonHeadBlock
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.hit.BlockHitResult
@@ -36,31 +33,23 @@ object GrabUtil {
         }
     }
 
-    fun getBlockToGrab(user: PlayerEntity, reach: Double): BlockAsAnEntity? {
+    fun getBlockToGrab(user: PlayerEntity, reach: Double, power: Double): BlockAsAnEntity? {
         val result = user.raycast(reach, 1f, false)
         val world = user.world
 
         if (result.type != HitResult.Type.MISS && result is BlockHitResult) {
+            val grabShape = CubeGrabShape // TODO
             val blockPos = result.blockPos
-            val state = world.getBlockState(blockPos)
-            val up = blockPos.up()
-            val above = world.getBlockState(up)
-            val uper = up.up()
-            val abover = world.getBlockState(uper)
 
-            if (isBlockImmobile(world, blockPos, state)) return null
-            if (isBlockImmobile(world, up, above)) return null
-            if (isBlockImmobile(world, uper, abover)) return null
+            val compact = grabShape.compact(world, result.side, blockPos, power)
 
             val bEntity = BlockAsAnEntity(
                 world,
                 Vec3d.ofBottomCenter(blockPos),
-                CompactBlockStates(1, 1, 3, BlockPos.ORIGIN, state, above, abover)
+                compact
             )
             world.spawnEntity(bEntity)
-            world.removeBlock(blockPos, false)
-            world.removeBlock(up, false)
-            world.removeBlock(uper, false)
+
             return bEntity
         }
         return null
@@ -121,18 +110,5 @@ object GrabUtil {
         return EntityHitResult(entity, hit)
     }
 
-    // filtering blocks that cannot be grabbed:
-    // 1) it cannot allow mobs to spawn inside, i.e. air & cave air
-    // 2) it cannot house block entities, since block entity logic is tricky (although TODO I can add this later...?)
-    // 3) it cannot be denied by the deny list
 
-    // TODO: allow moving multiple blocks: could be useful when moving double blocks such as doors, or moving multiple blocks as a cluster
-    private fun isBlockImmobile(world: World, pos: BlockPos, state: BlockState): Boolean
-            = state.block.canMobSpawnInside() ||
-            world.getBlockEntity(pos) != null ||
-            state.block in GravityGunTags.IMMOBILE_BLOCKS ||
-            (
-                state.block is PistonBlock &&
-                state.get(PistonBlock.EXTENDED) // disallow extended pistons
-            )
 }
