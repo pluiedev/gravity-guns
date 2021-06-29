@@ -2,6 +2,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "5.2.0"
     id("fabric-loom") version "0.8-SNAPSHOT"
     kotlin("jvm") version "1.5.10"
+    kotlin("plugin.serialization") version "1.5.0"
     `maven-publish`
 }
 
@@ -19,6 +20,7 @@ repositories {
     }
     maven("https://maven.terraformersmc.com/releases/") { name = "Terraformers" }
     maven("https://aperlambda.github.io/maven") { name = "AperLambda" }
+    maven("https://maven.shedaniel.me/") { name = "shedaniel's Maven" }
 }
 
 dependencies {
@@ -28,18 +30,34 @@ dependencies {
     val fapiVersion: String by project
     val flkVersion: String by project
     val geckolibVersion: String by project
-    val rayonVersion: String by project
-    val hermesVersion: String by project
-    val libbulletjmeVersion: String by project
+    val clothConfigLiteVersion: String by project
+    val modMenuVersion: String by project
 
     minecraft("com.mojang:minecraft:$minecraftVersion")
     mappings("net.fabricmc:yarn:$yarnVersion:v2")
     modImplementation("net.fabricmc:fabric-loader:$floaderVersion")
-
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fapiVersion")
-
     modImplementation("net.fabricmc:fabric-language-kotlin:$flkVersion")
+
+    rayon()
     modApi("software.bernie.geckolib:geckolib-fabric-1.17:$geckolibVersion:dev")
+    modImplementation("dev.lambdaurora:lambdynamiclights:2.0.1+1.17") {
+        exclude(group = "com.google.guava") // takes ages to download and ultimately isn't vital
+    }
+    modApi("me.shedaniel.cloth:cloth-config-lite-fabric:$clothConfigLiteVersion")
+    include("me.shedaniel.cloth:cloth-config-lite-fabric:$clothConfigLiteVersion")
+    modCompileOnly("com.terraformersmc:modmenu:$modMenuVersion") {
+        isTransitive = false
+    }
+    modRuntime("com.terraformersmc:modmenu:$modMenuVersion") {
+        isTransitive = false
+    }
+}
+
+fun DependencyHandlerScope.rayon() {
+    val rayonVersion: String by project
+    val hermesVersion: String by project
+    val libbulletjmeVersion: String by project
 
     // FIXME: 2xsaiko's fat dep (i.e. net.dblsaiko.rayon:rayon) doesn't show up correctly as separate modules in IDEA.
     implementation("com.github.stephengold:Libbulletjme:$libbulletjmeVersion")
@@ -48,11 +66,6 @@ dependencies {
     modApi("net.dblsaiko.rayon:rayon-core:$rayonVersion")
     modApi("net.dblsaiko.rayon:rayon-entity:$rayonVersion")
     modRuntime("dev.inkwell:hermes:$hermesVersion")
-
-    modImplementation("dev.lambdaurora:lambdynamiclights:2.0.1+1.17") {
-        exclude(group = "com.google.guava")
-    }
-
 }
 
 java {
