@@ -1,5 +1,6 @@
 {
     "itemGroup.gravityguns.group": "Gravity Guns",
 
-    "item.gravityguns.gravity_gun": "Gravity Gun"
+    "item.gravityguns.gravity_gun": "Gravity Gun",
+    "text.gravityguns.update_power": "Current Power: %s"
 }

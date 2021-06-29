@@ -4,6 +4,7 @@ import com.leocth.gravityguns.data.GravityGunTags
 import com.leocth.gravityguns.entity.BlockAsAnEntity
 import com.leocth.gravityguns.entity.CompactBlockStates
 import com.leocth.gravityguns.item.GravityGunItem
+import com.leocth.gravityguns.network.GravityGunsC2SPackets
 import com.leocth.gravityguns.physics.GrabbingManager
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder
@@ -26,6 +27,7 @@ object GravityGuns: ModInitializer {
     val GRAVITY_GUN = GravityGunItem(defaultSettings.maxDamage(2000))
 
     override fun onInitialize() {
+        GravityGunsC2SPackets.registerListeners()
         GravityGunTags.register()
 
         Registry.register(Registry.ITEM, id("gravity_gun"), GRAVITY_GUN)
@@ -37,7 +39,7 @@ object GravityGuns: ModInitializer {
         ServerTickEvents.END_SERVER_TICK.register { GrabbingManager.SERVER.tick() }
     }
 
-    val defaultSettings get() = Item.Settings().group(ITEM_GROUP)
+    private val defaultSettings: Item.Settings get() = Item.Settings().group(ITEM_GROUP)
 
     @Suppress("NOTHING_TO_INLINE")
     inline fun id(path: String) = Identifier(MOD_ID, path)

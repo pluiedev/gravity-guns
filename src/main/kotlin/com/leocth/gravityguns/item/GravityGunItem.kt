@@ -20,6 +20,12 @@ import software.bernie.geckolib3.core.manager.AnimationFactory
 class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
     private val factory = AnimationFactory(this)
 
+    companion object {
+        var ItemStack.power: Double
+            get() = tag?.getDouble("power") ?: 0.0
+            set(value) { orCreateTag.putDouble("power", value) }
+    }
+
     override fun getMaxUseTime(stack: ItemStack): Int = 20000
 
     override fun onStoppedUsing(stack: ItemStack, world: World, user: LivingEntity, remainingUseTicks: Int) {
