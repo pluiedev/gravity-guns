@@ -38,7 +38,7 @@ object CubeGrabShape: GrabShape {
         val box = BlockBox.create(p1, p2)
         box.move(direction.opposite.vector.multiply(half))
 
-        val states = CompactBlockStates(sideLen, sideLen, sideLen, BlockPos(direction.opposite.vector))
+        val states = CompactBlockStates(sideLen, sideLen, sideLen, BlockPos(-half, -half, -half))
 
         box.forEachEncompassed { x, y, z, pos ->
             val state = world.getBlockState(pos)
