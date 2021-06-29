@@ -18,38 +18,7 @@ import software.bernie.geckolib3.model.AnimatedGeoModel
 import software.bernie.geckolib3.renderers.geo.GeoItemRenderer
 
 @Environment(EnvType.CLIENT)
-class GravityGunRenderer: GeoItemRenderer<GravityGunItem>(GravityGunModel) {
-    private var ticks = 0
-
-    override fun render(
-        stack: ItemStack,
-        mode: ModelTransformation.Mode,
-        matrices: MatrixStack,
-        vertexConsumers: VertexConsumerProvider,
-        light: Int,
-        overlay: Int
-    ) {
-        super.render(stack, mode, matrices, vertexConsumers, light, overlay)
-        ticks++
-
-        // draw floating block
-        if (mode != ModelTransformation.Mode.GUI) {
-            val client = MinecraftClient.getInstance() ?: return
-
-            val tag = stack.tag ?: return
-            val state = NbtHelper.toBlockState(tag.getCompound("block"))
-
-            matrices.frame {
-                val y = 0.1 * MathHelper.sin(ticks / 100f) - 0.05
-
-                it.translate(0.0, y, -10.0)
-                it.scale(2.0f, 2.0f, 2.0f)
-                it.multiply(Quaternion(10f, 10f, 10f, true))
-                client.blockRenderManager.renderBlockAsEntity(state, it, vertexConsumers, light, overlay)
-            }
-        }
-    }
-}
+class GravityGunRenderer: GeoItemRenderer<GravityGunItem>(GravityGunModel)
 
 @Environment(EnvType.CLIENT)
 object GravityGunModel: AnimatedGeoModel<GravityGunItem>() {
