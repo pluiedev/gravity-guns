@@ -26,13 +26,13 @@
     "dynamiclights": [
       {
         "adapter": "kotlin",
-        "value": "com.leocth.gravityguns.client.LdlSupport"
+        "value": "com.leocth.gravityguns.client.integration.LdlIntegration"
       }
     ],
     "modmenu": [
       {
         "adapter": "kotlin",
-        "value": "com.leocth.gravityguns.client.ModMenuSupport"
+        "value": "com.leocth.gravityguns.client.integration.ModMenuIntegration"
       }
     ]
   },
