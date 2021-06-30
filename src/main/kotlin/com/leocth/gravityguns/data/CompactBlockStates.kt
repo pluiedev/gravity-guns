@@ -1,8 +1,10 @@
-package com.leocth.gravityguns.entity
+package com.leocth.gravityguns.data
 
+import com.leocth.gravityguns.util.ext.findIntArray
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.entity.data.TrackedDataHandler
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
@@ -25,10 +27,35 @@ class CompactBlockStates(
         private set
 
     val size: Int get() = blockStates.size
-    val boundingBox: Box get() = Box(offset, offset.add(length - 1, height - 1, width - 1))
+    val boundingBox: Box get() = Box(offset, offset.add(length, height, width))
 
     init {
         require(length * width * height == size)
+    }
+
+    fun writeToNbt(nbt: NbtCompound) {
+        with(nbt) {
+            putIntArray("dimensions", intArrayOf(length, width, height))
+            putIntArray("offset", intArrayOf(offset.x, offset.y, offset.z))
+            putIntArray("states", blockStates)
+        }
+    }
+
+    fun readFromNbt(nbt: NbtCompound) {
+        with(nbt) {
+            findIntArray("dimensions") {
+                require(it.size == 3)
+                length = it[0]
+                width = it[1]
+                height = it[2]
+            }
+            findIntArray("offset") {
+                require(it.size == 3)
+                val (x, y, z) = it
+                offset = BlockPos(x, y, z)
+            }
+            blockStates = getIntArray("states")
+        }
     }
 
     fun writeToBuf(buf: PacketByteBuf) {

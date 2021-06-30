@@ -3,7 +3,7 @@ package com.leocth.gravityguns
 import com.leocth.gravityguns.config.GravityGunsConfig
 import com.leocth.gravityguns.data.GravityGunTags
 import com.leocth.gravityguns.entity.BlockAsAnEntity
-import com.leocth.gravityguns.entity.CompactBlockStates
+import com.leocth.gravityguns.data.CompactBlockStates
 import com.leocth.gravityguns.item.GravityGunItem
 import com.leocth.gravityguns.network.GravityGunsC2SPackets
 import com.leocth.gravityguns.physics.GrabbingManager
