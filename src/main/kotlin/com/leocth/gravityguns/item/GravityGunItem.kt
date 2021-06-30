@@ -1,8 +1,10 @@
 package com.leocth.gravityguns.item
 
+import com.leocth.gravityguns.GravityGuns
 import com.leocth.gravityguns.physics.GrabUtil
 import com.leocth.gravityguns.physics.GrabbingManager
 import com.leocth.gravityguns.util.ext.toBullet
+import dev.lazurite.rayon.core.impl.bullet.thread.PhysicsThread
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
@@ -35,8 +37,11 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
             if (user is ServerPlayerEntity && grabbingManager.isPlayerGrabbing(user)) {
                 val instance = grabbingManager.instances[user.uuid]
                 instance?.let {
-                    val impulse = user.rotationVector.multiply(20.0).toBullet()
-                    it.grabbedBody.setLinearVelocity(impulse)
+                    val config = GravityGuns.CONFIG
+                    val velocity = user.rotationVector.multiply(config.launchInitialVelocityMultiplier).toBullet()
+                    PhysicsThread.get(world).execute {
+                        it.grabbedBody.setLinearVelocity(velocity)
+                    }
                 }
 
                 grabbingManager.tryUngrab(user, 5.0f)
@@ -51,9 +56,11 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable {
             val grabbingManager = GrabbingManager.SERVER
 
             if (!grabbingManager.isPlayerGrabbing(user)) {
+                val config = GravityGuns.CONFIG
+
                 val thingToGrab =
-                    GrabUtil.getEntityToGrab(user, 7.0) ?:
-                    GrabUtil.getBlockToGrab(user, 8.0, stack.power) ?:
+                    GrabUtil.getEntityToGrab(user, config.entityReachDistance) ?:
+                    GrabUtil.getBlockToGrab(user, config.blockReachDistance, stack.power) ?:
                     return TypedActionResult.fail(stack)
 
                 grabbingManager.tryGrab(user, thingToGrab)

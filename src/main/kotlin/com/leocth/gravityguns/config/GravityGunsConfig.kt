@@ -7,7 +7,7 @@ data class GravityGunsConfig(
     /**
      * The maximum power level the gravity gun can use. This affects how many blocks one can grab.
      */
-    var maximumPowerLevel: Int = 5,
+    var maximumPowerLevel: Double = 5.0,
 
     /**
      * The multiplier for the launch initial velocity; the higher this is, the faster it goes.

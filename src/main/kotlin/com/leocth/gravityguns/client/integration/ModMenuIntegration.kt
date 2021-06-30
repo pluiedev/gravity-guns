@@ -13,7 +13,7 @@ object ModMenuIntegration: ModMenuApi {
         val config = GravityGuns.CONFIG
 
         ConfigScreen.create(TranslatableText("screen.gravityguns.config"), it).apply {
-            addProp("screen.gravityguns.config.maximumPowerLevel", config::maximumPowerLevel, 5)
+            addProp("screen.gravityguns.config.maximumPowerLevel", config::maximumPowerLevel, 5.0)
             addProp("screen.gravityguns.config.launchInitialVelocityMultiplier", config::launchInitialVelocityMultiplier, 20.0)
             addProp("screen.gravityguns.config.entityReachDistance", config::entityReachDistance, 7.0)
             addProp("screen.gravityguns.config.blockReachDistance", config::blockReachDistance, 8.0)

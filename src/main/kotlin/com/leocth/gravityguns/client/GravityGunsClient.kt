@@ -57,12 +57,12 @@ object GravityGunsClient: ClientModInitializer {
 
             var power = stack.power
             power += clampedDelta
-            if (power < 0.0) power = 0.0
-            stack.power = power
+            power = MathHelper.clamp(power, 0.0, GravityGuns.CONFIG.maximumPowerLevel)
 
-            GravityGunsC2SPackets.sendUpdatePowerPacket(stack.power)
+            GravityGunsC2SPackets.sendUpdatePowerPacket(power)
             player.sendMessage(TranslatableText("text.gravityguns.update_power", power), true)
 
+            stack.power = power
             ci.cancel()
         }
     }
