@@ -22,8 +22,17 @@ import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 
 class BlockAsAnEntity(
+    entityType: EntityType<*>,
     world: World,
-) : Entity(TYPE, world), EntityPhysicsElement {
+) : Entity(entityType, world), EntityPhysicsElement {
+    /*
+    private val rigidBody = EntityRigidBody(
+        this,
+        MinecraftSpace.get(world),
+        MinecraftShape.of(states.boundingBox)
+    )
+
+     */
     private val rigidBody = EntityRigidBody(this)
 
     var states: CompactBlockStates
@@ -40,10 +49,10 @@ class BlockAsAnEntity(
         world: World,
         pos: Vec3d,
         states: CompactBlockStates
-    ): this(world) {
-        rigidBody.collisionShape = MinecraftShape.of(states.boundingBox)
-        setPosition(pos.x, pos.y + (1f - height) / 2.0, pos.z)
+    ): this(TYPE, world) {
         this.states = states
+        setPosition(pos.x, pos.y + (1f - height) / 2.0, pos.z)
+        rigidBody.collisionShape = MinecraftShape.of(states.boundingBox)
     }
 
     override fun initDataTracker() {
