@@ -1,8 +1,7 @@
 package com.leocth.gravityguns.physics
 
 import com.leocth.gravityguns.data.GravityGunTags
-import com.leocth.gravityguns.entity.CompactBlockStates
-import net.minecraft.block.Block
+import com.leocth.gravityguns.data.CompactBlockStates
 import net.minecraft.block.BlockState
 import net.minecraft.block.PistonBlock
 import net.minecraft.util.math.BlockBox
@@ -41,11 +40,9 @@ object CubeGrabShape: GrabShape {
         val states = CompactBlockStates(sideLen, sideLen, sideLen, BlockPos(-half, -half, -half))
 
         box.forEachEncompassed { x, y, z, pos ->
-            val state = world.getBlockState(pos)
-            states[x, y, z] = state
-
-            assert(states[x, y, z] == state)
-            world.removeBlock(pos, false)
+            removeAndGetStateAt(world, pos)?.let {
+                states[x, y, z] = it
+            }
         }
 
         return states
