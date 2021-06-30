@@ -1,6 +1,6 @@
 package com.leocth.gravityguns.entity
 
-import com.jme3.math.Vector3f
+import com.leocth.gravityguns.data.CompactBlockStates
 import com.leocth.gravityguns.physics.GrabbingManager
 import com.leocth.gravityguns.util.ext.*
 import dev.lazurite.rayon.core.impl.bullet.collision.body.BlockRigidBody
@@ -9,23 +9,15 @@ import dev.lazurite.rayon.core.impl.bullet.collision.space.MinecraftSpace
 import dev.lazurite.rayon.entity.api.EntityPhysicsElement
 import dev.lazurite.rayon.entity.impl.collision.body.EntityRigidBody
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricEntityTypeBuilder
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityDimensions
-import net.minecraft.entity.EntityPose
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.data.DataTracker
-import net.minecraft.entity.data.TrackedDataHandlerRegistry
 import net.minecraft.fluid.Fluids
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.Packet
-import net.minecraft.network.PacketByteBuf
-import net.minecraft.network.listener.ClientPlayPacketListener
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 
@@ -58,8 +50,12 @@ class BlockAsAnEntity(
         dataTracker.startTracking(BLOCK_STATES, CompactBlockStates.makeEmpty())
     }
 
-    override fun readCustomDataFromNbt(nbt: NbtCompound) {}
-    override fun writeCustomDataToNbt(nbt: NbtCompound) {}
+    override fun readCustomDataFromNbt(nbt: NbtCompound) {
+        states.readFromNbt(nbt)
+    }
+    override fun writeCustomDataToNbt(nbt: NbtCompound) {
+        states.writeToNbt(nbt)
+    }
 
     override fun createSpawnPacket(): Packet<*>
         = EntitySpawnS2CPacket(this)
@@ -104,8 +100,8 @@ class BlockAsAnEntity(
         private val BLOCK_STATES = DataTracker.registerData(BlockAsAnEntity::class.java, CompactBlockStates.DATA_HANDLER)
 
         val TYPE: EntityType<BlockAsAnEntity> = FabricEntityTypeBuilder.create<BlockAsAnEntity>()
-            .dimensions(EntityDimensions.fixed(1f, 1f))
-            .entityFactory { _: EntityType<BlockAsAnEntity>, world -> BlockAsAnEntity(world) }
+            .dimensions(EntityDimensions.fixed(3f, 3f))
+            .entityFactory(::BlockAsAnEntity)
             .build()
     }
 }
