@@ -1,5 +1,6 @@
 package com.leocth.gravityguns.client.render.entity
 
+import com.jme3.math.Quaternion
 import com.leocth.gravityguns.entity.BlockAsAnEntity
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
@@ -15,10 +16,16 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.OverlayTexture
 import net.minecraft.client.render.RenderLayers
 import net.minecraft.client.render.WorldRenderer
-import net.minecraft.util.math.BlockPos
+import net.minecraft.client.render.block.BlockRenderManager
+import net.minecraft.util.math.Quaternion as QuaternionMC
 
 @Environment(EnvType.CLIENT)
 class BlockAsAnEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<BlockAsAnEntity>(ctx) {
+
+    private val blockRenderManager: BlockRenderManager = MinecraftClient.getInstance().blockRenderManager
+    private var tempQuat: Quaternion = Quaternion()
+    private var tempQuatMc: QuaternionMC = QuaternionMC(0f, 0f, 0f, 0f)
+
     init { shadowRadius = 0.5f }
 
     override fun render(
@@ -30,19 +37,22 @@ class BlockAsAnEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRender
         light: Int
     ) {
         val states = entity.states
-
         val world = entity.world
-        val blockPos = BlockPos(entity.x, entity.boundingBox.maxY, entity.z)
-        val blockRenderManager = MinecraftClient.getInstance().blockRenderManager
+        val blockPos = entity.blockPos
 
-        matrices.frame {
+        matrices.frame { stack ->
+            val rigidBody = entity.rigidBody
+
+            rigidBody.getPhysicsRotation(tempQuat)
+            tempQuatMc.set(tempQuat.x, tempQuat.y, tempQuat.z, tempQuat.w)
+            stack.multiply(tempQuatMc)
+
             // TODO: this is horrible for performance. use a baked model.
             states.forEach { _, _, _, pos, state ->
                 if (state.renderType == BlockRenderType.MODEL) {
                     val l = WorldRenderer.getLightmapCoordinates(world, state, pos)
                     matrices.frame {
-                        it.translate(-0.5, -0.5, -0.5)
-                        it.translate(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())
+                        it.translate(pos.x-0.5, pos.y-0.5, pos.z-0.5)
                         blockRenderManager.modelRenderer.render(
                             world,
                             blockRenderManager.getModel(state),

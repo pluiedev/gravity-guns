@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtElement
 import net.minecraft.nbt.NbtHelper
+import net.minecraft.nbt.NbtIntArray
 import net.minecraft.util.Identifier
 
 inline fun NbtCompound.getCompound(key: String, action: (NbtCompound) -> Unit): NbtCompound {
@@ -39,19 +40,29 @@ inline fun NbtCompound.putBlockState(key: String, state: BlockState) {
     put(key, NbtHelper.fromBlockState(state))
 }
 
-inline fun NbtCompound.find(key: String, type: Int, ifFound: (NbtElement) -> Unit): NbtElement? {
+inline fun NbtCompound.find(key: String, type: Int, ifFound: (NbtElement) -> Unit = {}): NbtElement? {
     val element = get(key)
     if (element != null && element.type == type.toByte())
         ifFound(element)
     return element
 }
 
-inline fun NbtCompound.findCompound(key: String, ifFound: (NbtCompound) -> Unit): NbtCompound? {
+inline fun NbtCompound.findCompound(key: String, ifFound: (NbtCompound) -> Unit = {}): NbtCompound? {
     val element = get(key)
     if (element != null && element.type == NbtType.COMPOUND.toByte()) {
         val compound = element as NbtCompound
         ifFound(element)
         return element
+    }
+    return null
+}
+
+inline fun NbtCompound.findIntArray(key: String, ifFound: (IntArray) -> Unit = {}): NbtIntArray? {
+    val element = get(key)
+    if (element != null && element.type == NbtType.INT_ARRAY.toByte()) {
+        val e = element as NbtIntArray
+        ifFound(e.intArray)
+        return e
     }
     return null
 }
