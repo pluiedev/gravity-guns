@@ -14,6 +14,8 @@ import net.minecraft.client.network.ClientPlayNetworkHandler
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.PacketByteBuf
+import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.util.Identifier
 
 object GravityGunsS2CPackets {
     val GRAB = GravityGuns.id("grab")
@@ -58,22 +60,22 @@ object GravityGunsS2CPackets {
 
 
     fun sendGrabPacket(owner: PlayerEntity, entity: Entity) {
-        val buf = PacketByteBufs.create().apply {
+        PlayerLookup.tracking(entity).sendToAll(GRAB) {
             writeVarInt(owner.id)
             writeVarInt(entity.id)
-        }
-        PlayerLookup.tracking(entity).forEach {
-            ServerPlayNetworking.send(it, GRAB, buf)
         }
     }
 
     fun sendUngrabPacket(owner: PlayerEntity, entity: Entity, strength: Float) {
-        val buf = PacketByteBufs.create().apply {
+        PlayerLookup.tracking(entity).sendToAll(UNGRAB) {
             writeVarInt(owner.id)
             writeFloat(strength)
         }
-        PlayerLookup.tracking(entity).forEach {
-            ServerPlayNetworking.send(it, UNGRAB, buf)
+    }
+
+    private inline fun Collection<ServerPlayerEntity>.sendToAll(channelId: Identifier, bufBuilder: PacketByteBuf.() -> Unit) {
+        forEach {
+            ServerPlayNetworking.send(it, channelId, PacketByteBufs.create().apply(bufBuilder))
         }
     }
 }
