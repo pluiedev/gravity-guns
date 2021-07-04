@@ -1,12 +1,13 @@
 package com.leocth.gravityguns
 
 import com.leocth.gravityguns.config.GravityGunsConfig
-import com.leocth.gravityguns.data.GravityGunTags
+import com.leocth.gravityguns.data.GravityGunsTags
 import com.leocth.gravityguns.entity.BlockAsAnEntity
 import com.leocth.gravityguns.data.CompactBlockStates
 import com.leocth.gravityguns.item.GravityGunItem
 import com.leocth.gravityguns.network.GravityGunsC2SPackets
 import com.leocth.gravityguns.physics.GrabbingManager
+import com.leocth.gravityguns.sound.GravityGunsSounds
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -59,7 +60,8 @@ object GravityGuns: ModInitializer {
 
     private fun registerStuff() {
         GravityGunsC2SPackets.registerListeners()
-        GravityGunTags.register()
+        GravityGunsTags.register()
+        GravityGunsSounds.register()
 
         Registry.register(Registry.ITEM, id("gravity_gun"), GRAVITY_GUN)
         Registry.register(Registry.ENTITY_TYPE, id("block"), BlockAsAnEntity.TYPE)

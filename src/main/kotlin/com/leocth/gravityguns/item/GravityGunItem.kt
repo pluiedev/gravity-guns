@@ -7,19 +7,23 @@ import com.leocth.gravityguns.util.ext.setAnimation
 import com.leocth.gravityguns.util.ext.toBullet
 import dev.lazurite.rayon.core.impl.bullet.thread.PhysicsThread
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup
+import net.minecraft.client.MinecraftClient
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.sound.SoundEvent
 import net.minecraft.util.Hand
+import net.minecraft.util.Identifier
 import net.minecraft.util.TypedActionResult
 import net.minecraft.world.World
 import software.bernie.geckolib3.core.AnimationState
 import software.bernie.geckolib3.core.IAnimatable
 import software.bernie.geckolib3.core.PlayState
 import software.bernie.geckolib3.core.controller.AnimationController
+import software.bernie.geckolib3.core.event.SoundKeyframeEvent
 import software.bernie.geckolib3.core.manager.AnimationData
 import software.bernie.geckolib3.core.manager.AnimationFactory
 import software.bernie.geckolib3.network.GeckoLibNetwork
@@ -95,6 +99,18 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable, ISyncabl
         controller.setAnimation {
             it.addAnimation("animation.gravity_gun.closed")
         }
+        // TODO: remind myself to fix this bullshit for geckolib
+        controller.registerSoundListener(object : AnimationController.ISoundListener {
+            override fun <A : IAnimatable> playSound(event: SoundKeyframeEvent<A>) {
+                println(event.sound)
+                val player = MinecraftClient.getInstance().player
+                // look i'm fucking tired alright
+                val volume = if (event.sound == "item.gravity_gun.woo") 0.1f else 1f
+
+                player?.playSound(SoundEvent(GravityGuns.id(event.sound)), volume, 1f)
+            }
+
+        })
         data.addAnimationController(controller)
     }
 
