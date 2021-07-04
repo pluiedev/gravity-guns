@@ -1,6 +1,8 @@
 package com.leocth.gravityguns.entity
 
+import com.glisco.worldmesher.WorldMesh
 import com.leocth.gravityguns.data.CompactBlockStates
+import com.leocth.gravityguns.network.GravityGunsC2SPackets
 import com.leocth.gravityguns.physics.GrabbingManager
 import com.leocth.gravityguns.util.ext.*
 import dev.lazurite.rayon.core.impl.bullet.collision.body.BlockRigidBody
@@ -8,6 +10,10 @@ import dev.lazurite.rayon.core.impl.bullet.collision.body.shape.MinecraftShape
 import dev.lazurite.rayon.core.impl.bullet.collision.space.MinecraftSpace
 import dev.lazurite.rayon.entity.api.EntityPhysicsElement
 import dev.lazurite.rayon.entity.impl.collision.body.EntityRigidBody
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricEntityTypeBuilder
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityDimensions
@@ -33,7 +39,12 @@ class BlockAsAnEntity(
     )
 
      */
-    private val rigidBody = EntityRigidBody(this)
+    @Environment(EnvType.CLIENT)
+    var mesh: WorldMesh? = null
+        private set
+
+    @get:JvmName("wtfIsThis")
+    private val rigidBody by lazy { EntityRigidBody(this) }
 
     var states: CompactBlockStates
         get() = dataTracker.get(BLOCK_STATES)
@@ -41,8 +52,6 @@ class BlockAsAnEntity(
 
     init {
         inanimate = true
-        rigidBody.dragCoefficient = 0.0005f
-        rigidBody.mass = 5.0f
     }
 
     constructor(
@@ -54,6 +63,8 @@ class BlockAsAnEntity(
         setPosition(pos.x, pos.y + (1f - height) / 2.0, pos.z)
         rigidBody.collisionShape = MinecraftShape.of(states.boundingBox)
     }
+
+    override fun genShape(): MinecraftShape = MinecraftShape.of(states.boundingBox)
 
     override fun initDataTracker() {
         dataTracker.startTracking(BLOCK_STATES, CompactBlockStates.makeEmpty())
@@ -103,6 +114,21 @@ class BlockAsAnEntity(
 
 
         }
+    }
+
+    @Environment(EnvType.CLIENT)
+    fun buildMesh(p1: BlockPos, p2: BlockPos) {
+        // TODO: this is horrible.
+        val mesh = WorldMesh.Builder(world, p1, p2).build() ?: throw IllegalStateException("what the fuck?")
+
+        while (!mesh.canRender()) {
+            // g l i s c o w h y ?
+            runBlocking {
+                delay(50)
+            }
+        }
+        this.mesh = mesh
+        GravityGunsC2SPackets.sendMeshReadyPacket(p1, p2)
     }
 
     companion object {

@@ -1,9 +1,17 @@
 package com.leocth.gravityguns.physics
 
+import com.glisco.worldmesher.WorldMesh
+import com.glisco.worldmesher.internals.WorldMesher
 import com.leocth.gravityguns.data.GravityGunTags
 import com.leocth.gravityguns.data.CompactBlockStates
+import com.leocth.gravityguns.network.GravityGunsS2CPackets
+import kotlinx.coroutines.runBlocking
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.minecraft.block.BlockState
 import net.minecraft.block.PistonBlock
+import net.minecraft.client.world.ClientWorld
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.math.BlockBox
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
@@ -12,30 +20,39 @@ import kotlin.math.ceil
 
 interface GrabShape {
     fun compact(
+        user: PlayerEntity,
         world: World,
         direction: Direction,
         hitPoint: BlockPos,
         power: Double,
-    ): CompactBlockStates
+    ): Triple<CompactBlockStates, BlockPos, BlockPos>
+
+    @Environment(EnvType.CLIENT)
+    fun makeMesh(
+        world: ClientWorld,
+        p1: BlockPos,
+        p2: BlockPos,
+    ): WorldMesh
 }
 
 object CubeGrabShape: GrabShape {
     override fun compact(
+        user: PlayerEntity,
         world: World,
         direction: Direction,
         hitPoint: BlockPos,
         power: Double,
-    ): CompactBlockStates {
+    ): Triple<CompactBlockStates, BlockPos, BlockPos> {
         val sideLen = ceil(power).toInt()
         val lenMinusOne = sideLen - 1
         val half = lenMinusOne / 2
         val otherHalf = lenMinusOne - half
 
-        val p1 = hitPoint.add(-half,-half,-half)
-        val p2 = hitPoint.add(otherHalf, otherHalf, otherHalf)
+        val off = direction.opposite.vector.multiply(half)
+        val p1 = hitPoint.add(-half,-half,-half).add(off)
+        val p2 = hitPoint.add(otherHalf, otherHalf, otherHalf).add(off)
 
         val box = BlockBox.create(p1, p2)
-        box.move(direction.opposite.vector.multiply(half))
 
         val states = CompactBlockStates(sideLen, sideLen, sideLen, BlockPos(-half, -half, -half))
 
@@ -45,7 +62,11 @@ object CubeGrabShape: GrabShape {
             }
         }
 
-        return states
+        return Triple(states, p1, p2)
+    }
+
+    override fun makeMesh(world: ClientWorld, p1: BlockPos, p2: BlockPos): WorldMesh {
+        TODO("Not yet implemented")
     }
 }
 
@@ -81,6 +102,6 @@ private fun isBlockImmobile(world: World, pos: BlockPos, state: BlockState): Boo
 private fun removeAndGetStateAt(world: World, blockPos: BlockPos): BlockState? {
     val state = world.getBlockState(blockPos)
     if (isBlockImmobile(world, blockPos, state)) return null
-    world.removeBlock(blockPos, false)
+    //world.removeBlock(blockPos, false)
     return state
 }

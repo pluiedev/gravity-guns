@@ -21,6 +21,7 @@ repositories {
     maven("https://maven.terraformersmc.com/releases/") { name = "Terraformers" }
     maven("https://aperlambda.github.io/maven") { name = "AperLambda" }
     maven("https://maven.shedaniel.me/") { name = "shedaniel's Maven" }
+    maven("https://jitpack.io") { name = "JitPack" }
 
     mavenLocal()
 }
@@ -55,6 +56,7 @@ dependencies {
         isTransitive = false
     }
     modApi("net.dblsaiko.rayon:rayon:$rayonVersion")
+    modImplementation("com.github.glisco03:worldmesher:1.17-SNAPSHOT")
 }
 
 java {

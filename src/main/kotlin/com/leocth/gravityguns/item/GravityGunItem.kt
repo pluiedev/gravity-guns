@@ -60,6 +60,7 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable, ISyncabl
                 }
 
                 grabbingManager.tryUngrab(user, 5.0f)
+                user.itemCooldownManager.set(GravityGuns.GRAVITY_GUN, 15)
                 syncAnimation(user, world, stack, RETRACT)
             }
         }
@@ -75,7 +76,7 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable, ISyncabl
                 val config = GravityGuns.CONFIG
 
                 val thingToGrab =
-                    GrabUtil.getEntityToGrab(user, config.entityReachDistance) ?:
+                    //GrabUtil.getEntityToGrab(user, config.entityReachDistance) ?:
                     GrabUtil.getBlockToGrab(user, config.blockReachDistance, stack.power) ?:
                     return TypedActionResult.fail(stack)
 
@@ -90,16 +91,16 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable, ISyncabl
     }
 
     override fun registerControllers(data: AnimationData) {
-        val controller = AnimationController(this, CONTROLLER_ID, 0f) {
-            PlayState.CONTINUE
+        val controller = AnimationController(this, CONTROLLER_ID, 1f) { PlayState.CONTINUE }
+        controller.setAnimation {
+            it.addAnimation("animation.gravity_gun.closed")
         }
-
         data.addAnimationController(controller)
     }
 
     override fun getFactory(): AnimationFactory = factory
 
-    fun syncAnimation(user: PlayerEntity, world: World, stack: ItemStack, anim: Int) {
+    private fun syncAnimation(user: PlayerEntity, world: World, stack: ItemStack, anim: Int) {
         if (world !is ServerWorld) throw IllegalStateException("syncAnimation may *only* be called on the logical server")
 
         val id = GeckoLibUtil.guaranteeIDForStack(stack, world)
@@ -111,6 +112,7 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable, ISyncabl
 
     override fun onAnimationSync(id: Int, state: Int) {
         val controller = GeckoLibUtil.getControllerForID(factory, id, CONTROLLER_ID)
+        //controller.clearAnimationCache()
         controller.markNeedsReload()
         controller.setAnimation {
             when (state) {

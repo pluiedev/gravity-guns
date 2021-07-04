@@ -2,11 +2,13 @@ package com.leocth.gravityguns.physics
 
 import com.leocth.gravityguns.data.GravityGunTags
 import com.leocth.gravityguns.entity.BlockAsAnEntity
+import com.leocth.gravityguns.network.GravityGunsS2CPackets
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.EntityHitResult
 import net.minecraft.util.hit.HitResult
+import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
 
@@ -37,14 +39,16 @@ object GrabUtil {
             val grabShape = CubeGrabShape // TODO
             val blockPos = result.blockPos
 
-            val compact = grabShape.compact(world, result.side, blockPos, power)
+            val compact = grabShape.compact(user, world, result.side, blockPos, power)
 
             val bEntity = BlockAsAnEntity(
                 world,
                 Vec3d.ofBottomCenter(blockPos),
-                compact
+                compact.first
             )
             world.spawnEntity(bEntity)
+            // TODO: this is concern
+            GravityGunsS2CPackets.sendMakeMeshPacket(user, bEntity, compact.second, compact.third)
 
             return bEntity
         }

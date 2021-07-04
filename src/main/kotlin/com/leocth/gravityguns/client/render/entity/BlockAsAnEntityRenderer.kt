@@ -2,6 +2,9 @@ package com.leocth.gravityguns.client.render.entity
 
 import com.jme3.math.Quaternion
 import com.leocth.gravityguns.entity.BlockAsAnEntity
+import com.leocth.gravityguns.util.ext.component1
+import com.leocth.gravityguns.util.ext.component2
+import com.leocth.gravityguns.util.ext.component3
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.render.VertexConsumerProvider
@@ -36,18 +39,23 @@ class BlockAsAnEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRender
         vertexConsumers: VertexConsumerProvider,
         light: Int
     ) {
+        val mesh = entity.mesh ?: return
         val states = entity.states
         val world = entity.world
         val blockPos = entity.blockPos
 
         matrices.frame { stack ->
             val rigidBody = entity.rigidBody
-
             rigidBody.getPhysicsRotation(tempQuat)
             tempQuatMc.set(tempQuat.x, tempQuat.y, tempQuat.z, tempQuat.w)
             stack.multiply(tempQuatMc)
 
-            // TODO: this is horrible for performance. use a baked model.
+            val (oX, oY, oZ) = states.offset
+            stack.translate(oX - 0.5, oY - 0.5, oZ - 0.5)
+
+            mesh.render(matrices.peek().model)
+
+            /*
             states.forEach { _, _, _, pos, state ->
                 if (state.renderType == BlockRenderType.MODEL) {
                     val l = WorldRenderer.getLightmapCoordinates(world, state, pos)
@@ -70,6 +78,8 @@ class BlockAsAnEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRender
                     super.render(entity, yaw, tickDelta, matrices, vertexConsumers, l)
                 }
             }
+
+             */
         }
 
 
