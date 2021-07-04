@@ -1,0 +1,17 @@
+{
+    "item.gravity_gun.shutdown": {
+        "sounds": [ "gravityguns:physgun_off" ]
+    },
+    "item.gravity_gun.retract": {
+        "sounds": [ "gravityguns:physcannon_claws_close" ]
+    },
+    "item.gravity_gun.extend": {
+        "sounds": [ "gravityguns:physcannon_claws_open" ]
+    },
+    "item.gravity_gun.beam": {
+        "sounds": [ "gravityguns:physcannon_pickup" ]
+    },
+    "item.gravity_gun.woo": {
+        "sounds": [ "gravityguns:chargeloop" ]
+    }
+}

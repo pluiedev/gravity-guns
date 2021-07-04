@@ -6,7 +6,7 @@ import net.minecraft.block.Block
 import net.minecraft.entity.EntityType
 import net.minecraft.tag.Tag
 
-object GravityGunTags {
+object GravityGunsTags {
     val IMMOBILE_ENTITIES: Tag<EntityType<*>> = TagRegistry.entityType(GravityGuns.id("immobile"))
     val IMMOBILE_BLOCKS: Tag<Block> = TagRegistry.block(GravityGuns.id("immobile"))
 

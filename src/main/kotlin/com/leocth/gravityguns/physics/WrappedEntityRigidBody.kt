@@ -1,6 +1,5 @@
 package com.leocth.gravityguns.physics
 
-import com.jme3.bullet.objects.PhysicsRigidBody
 import com.leocth.gravityguns.util.ext.toBullet
 import dev.lazurite.rayon.core.impl.bullet.collision.body.MinecraftRigidBody
 import dev.lazurite.rayon.core.impl.bullet.collision.body.shape.MinecraftShape

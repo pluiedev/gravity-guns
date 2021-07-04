@@ -169,6 +169,9 @@ class GrabbingManager(val isServer: Boolean) {
         val CLIENT = GrabbingManager(false)
 
         val EMPTY_SHAPE by lazy { EmptyShape(false) }
+
+        fun get(isServer: Boolean): GrabbingManager
+            = if (isServer) SERVER else CLIENT
     }
 
     data class Instance(

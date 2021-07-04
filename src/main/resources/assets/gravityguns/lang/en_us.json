@@ -1,5 +1,12 @@
 {
     "itemGroup.gravityguns.group": "Gravity Guns",
 
-    "item.gravityguns.gravity_gun": "Gravity Gun"
+    "item.gravityguns.gravity_gun": "Gravity Gun",
+    "text.gravityguns.update_power": "Current Power: %s",
+
+    "screen.gravityguns.config": "Gravity Guns Config",
+    "screen.gravityguns.config.maximumPowerLevel": "Maximum Power Level",
+    "screen.gravityguns.config.launchInitialVelocityMultiplier": "Launch Initial Velocity Multiplier",
+    "screen.gravityguns.config.entityReachDistance": "Entity Reach Distance",
+    "screen.gravityguns.config.blockReachDistance": "Block Reach Distance"
 }
