@@ -57,6 +57,7 @@ dependencies {
     }
     modApi("net.dblsaiko.rayon:rayon:$rayonVersion")
     modImplementation("com.github.glisco03:worldmesher:1.17-SNAPSHOT")
+    include("com.github.glisco03:worldmesher:1.17-SNAPSHOT")
 }
 
 java {
