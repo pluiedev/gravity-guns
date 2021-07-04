@@ -1,11 +1,8 @@
 package com.leocth.gravityguns.physics
 
 import com.glisco.worldmesher.WorldMesh
-import com.glisco.worldmesher.internals.WorldMesher
-import com.leocth.gravityguns.data.GravityGunTags
+import com.leocth.gravityguns.data.GravityGunsTags
 import com.leocth.gravityguns.data.CompactBlockStates
-import com.leocth.gravityguns.network.GravityGunsS2CPackets
-import kotlinx.coroutines.runBlocking
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.block.BlockState
@@ -93,7 +90,7 @@ inline fun BlockBox.forEachEncompassed(action: (Int, Int, Int, BlockPos) -> Unit
 private fun isBlockImmobile(world: World, pos: BlockPos, state: BlockState): Boolean
         = state.isAir ||
         world.getBlockEntity(pos) != null ||
-        state.block in GravityGunTags.IMMOBILE_BLOCKS ||
+        state.block in GravityGunsTags.IMMOBILE_BLOCKS ||
         (
             state.block is PistonBlock &&
             state.get(PistonBlock.EXTENDED) // disallow extended pistons

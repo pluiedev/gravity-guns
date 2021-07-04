@@ -1,6 +1,6 @@
 package com.leocth.gravityguns.physics
 
-import com.leocth.gravityguns.data.GravityGunTags
+import com.leocth.gravityguns.data.GravityGunsTags
 import com.leocth.gravityguns.entity.BlockAsAnEntity
 import com.leocth.gravityguns.network.GravityGunsS2CPackets
 import net.minecraft.entity.Entity
@@ -8,7 +8,6 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.EntityHitResult
 import net.minecraft.util.hit.HitResult
-import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
 
@@ -23,7 +22,7 @@ object GrabUtil {
         val box = user.boundingBox.stretch(extended).expand(1.0)
 
         val result = raycastEntity(user, cameraPos, end, box, reach) {
-            it.type !in GravityGunTags.IMMOBILE_ENTITIES
+            it.type !in GravityGunsTags.IMMOBILE_ENTITIES
         } ?: return null
 
         return result.entity?.let {
