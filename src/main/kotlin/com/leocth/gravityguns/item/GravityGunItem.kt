@@ -102,7 +102,6 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable, ISyncabl
         // TODO: remind myself to fix this bullshit for geckolib
         controller.registerSoundListener(object : AnimationController.ISoundListener {
             override fun <A : IAnimatable> playSound(event: SoundKeyframeEvent<A>) {
-                println(event.sound)
                 val player = MinecraftClient.getInstance().player
                 // look i'm fucking tired alright
                 val volume = if (event.sound == "item.gravity_gun.woo") 0.1f else 1f
