@@ -31,14 +31,7 @@ class BlockAsAnEntity(
     entityType: EntityType<*>,
     world: World,
 ) : Entity(entityType, world), EntityPhysicsElement {
-    /*
-    private val rigidBody = EntityRigidBody(
-        this,
-        MinecraftSpace.get(world),
-        MinecraftShape.of(states.boundingBox)
-    )
 
-     */
     @Environment(EnvType.CLIENT)
     var mesh: WorldMesh? = null
         private set
@@ -61,7 +54,6 @@ class BlockAsAnEntity(
     ): this(TYPE, world) {
         this.states = states
         setPosition(pos.x, pos.y + (1f - height) / 2.0, pos.z)
-        rigidBody.collisionShape = MinecraftShape.of(states.boundingBox)
     }
 
     override fun genShape(): MinecraftShape = MinecraftShape.of(states.boundingBox)
