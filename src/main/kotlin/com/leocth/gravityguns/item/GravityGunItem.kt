@@ -75,12 +75,15 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable, ISyncabl
 
         if (!world.isClient) {
             val grabbingManager = GrabbingManager.SERVER
+            val power = stack.power
+
+            if (power <= 0f) return TypedActionResult.fail(stack)
 
             if (!grabbingManager.isPlayerGrabbing(user)) {
                 val config = GravityGuns.CONFIG
 
                 val thingToGrab =
-                    //GrabUtil.getEntityToGrab(user, config.entityReachDistance) ?:
+                    GrabUtil.getEntityToGrab(user, config.entityReachDistance) ?:
                     GrabUtil.getBlockToGrab(user, config.blockReachDistance, stack.power) ?:
                     return TypedActionResult.fail(stack)
 
@@ -95,13 +98,17 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable, ISyncabl
     }
 
     override fun registerControllers(data: AnimationData) {
-        val controller = AnimationController(this, CONTROLLER_ID, 1f) { PlayState.CONTINUE }
+        val controller = AnimationController(this, CONTROLLER_ID, 0.02f) { PlayState.CONTINUE }
         controller.setAnimation {
             it.addAnimation("animation.gravity_gun.closed")
         }
         // TODO: remind myself to fix this bullshit for geckolib
         controller.registerSoundListener(object : AnimationController.ISoundListener {
             override fun <A : IAnimatable> playSound(event: SoundKeyframeEvent<A>) {
+                // please, just
+                // spare my life geckolib
+                if (event.controller.animationState == AnimationState.Transitioning) return
+
                 val player = MinecraftClient.getInstance().player
                 // look i'm fucking tired alright
                 val volume = if (event.sound == "item.gravity_gun.woo") 0.1f else 1f
