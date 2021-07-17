@@ -96,7 +96,7 @@ tasks {
 publishing {
     publications {
         register<MavenPublication>("mavenJava") {
-            from(components["java"])
+            //from(components["java"])
             // add all the jars that should be included when publishing to maven
 
             artifact(tasks.remapJar) {
