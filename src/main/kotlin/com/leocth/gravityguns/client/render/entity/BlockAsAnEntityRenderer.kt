@@ -41,8 +41,6 @@ class BlockAsAnEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRender
     ) {
         val mesh = entity.mesh ?: return
         val states = entity.states
-        val world = entity.world
-        val blockPos = entity.blockPos
 
         matrices.frame { stack ->
             val rigidBody = entity.rigidBody
@@ -50,39 +48,11 @@ class BlockAsAnEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRender
             tempQuatMc.set(tempQuat.x, tempQuat.y, tempQuat.z, tempQuat.w)
             stack.multiply(tempQuatMc)
 
-            val (oX, oY, oZ) = states.offset
-            stack.translate(oX - 0.5, oY - 0.5, oZ - 0.5)
+            val (oX, oY, oZ) = states.apparentDisplayOffset
+            stack.translate(-oX, -oY, -oZ)
 
             mesh.render(matrices.peek().model)
-
-            /*
-            states.forEach { _, _, _, pos, state ->
-                if (state.renderType == BlockRenderType.MODEL) {
-                    val l = WorldRenderer.getLightmapCoordinates(world, state, pos)
-                    matrices.frame {
-                        it.translate(pos.x-0.5, pos.y-0.5, pos.z-0.5)
-                        blockRenderManager.modelRenderer.render(
-                            world,
-                            blockRenderManager.getModel(state),
-                            state,
-                            blockPos,
-                            it,
-                            vertexConsumers.getBuffer(RenderLayers.getMovingBlockLayer(state)),
-                            false,
-                            world.random,
-                            114514, // TODO
-                            OverlayTexture.DEFAULT_UV
-                        )
-
-                    }
-                    super.render(entity, yaw, tickDelta, matrices, vertexConsumers, l)
-                }
-            }
-
-             */
         }
-
-
     }
 
     @Suppress("DEPRECATION")
