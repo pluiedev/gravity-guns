@@ -1,19 +1,14 @@
 package com.leocth.gravityguns.physics
 
-import com.glisco.worldmesher.WorldMesh
 import com.leocth.gravityguns.data.GravityGunsTags
-import com.leocth.gravityguns.data.CompactBlockStates
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
+import com.leocth.gravityguns.data.GrabbedBlockPosSelection
 import net.minecraft.block.BlockState
 import net.minecraft.block.PistonBlock
-import net.minecraft.client.world.ClientWorld
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.math.BlockBox
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
-import kotlin.math.ceil
 
 interface GrabShape {
     fun compact(
@@ -22,7 +17,7 @@ interface GrabShape {
         direction: Direction,
         hitPoint: BlockPos,
         power: Double,
-    ): Triple<CompactBlockStates, BlockPos, BlockPos>
+    ): GrabbedBlockPosSelection
 }
 
 object CubeGrabShape: GrabShape {
@@ -32,39 +27,20 @@ object CubeGrabShape: GrabShape {
         direction: Direction,
         hitPoint: BlockPos,
         power: Double,
-    ): Triple<CompactBlockStates, BlockPos, BlockPos> {
+    ): GrabbedBlockPosSelection {
         val half = power.toInt() - 1
-        val sl = half * 2 + 1
 
         val off = direction.opposite.vector.multiply(half)
-        val p1 = hitPoint.mutableCopy().move(-half,-half,-half).move(off)
-        val p2 = hitPoint.mutableCopy().move(half, half, half).move(off)
-
-        val box = BlockBox.create(p1, p2)
-
-        val states = CompactBlockStates(sl, sl, sl, BlockPos.ORIGIN)
-
+        val min = hitPoint.mutableCopy().move(-half, -half, -half).move(off)
+        val max = hitPoint.mutableCopy().move(half, half, half).move(off)
 
         //TODO: handle edge cases like double blocks, ground foliage, etc
-        box.forEachEncompassed { x, y, z, pos ->
-            val state = world.getBlockState(pos)
-            if (!isBlockImmobile(world, pos, state)) {
-                states[x, y, z] = state
-            }
-        }
-        return Triple(states, p1, p2)
-    }
-}
-
-inline fun BlockBox.forEachEncompassed(action: (Int, Int, Int, BlockPos) -> Unit) {
-    val origin = BlockPos(minX, minY, minZ)
-    val mutable = origin.mutableCopy()
-    for (x in 0 until blockCountX) {
-        for (y in 0 until blockCountY) {
-            for (z in 0 until blockCountZ) {
-                mutable.move(x, y, z)
-                action(x, y, z, mutable)
-                mutable.set(origin)
+        return GrabbedBlockPosSelection(min, max, BlockPos.ORIGIN) {
+            val state = world.getBlockState(it)
+            if (!isBlockImmobile(world, it, state)) {
+                state
+            } else {
+                null
             }
         }
     }
