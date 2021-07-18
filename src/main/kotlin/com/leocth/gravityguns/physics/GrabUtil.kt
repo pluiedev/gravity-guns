@@ -38,16 +38,16 @@ object GrabUtil {
             val grabShape = CubeGrabShape // TODO
             val blockPos = result.blockPos
 
-            val compact = grabShape.compact(user, world, result.side, blockPos, power)
+            val sel = grabShape.compact(user, world, result.side, blockPos, power)
 
             val bEntity = BlockAsAnEntity(
                 world,
                 Vec3d.ofBottomCenter(blockPos),
-                compact.first
+                sel
             )
             world.spawnEntity(bEntity)
             // TODO: this is concern
-            GravityGunsS2CPackets.sendMakeMeshPacket(user, bEntity, compact.second, compact.third)
+            GravityGunsS2CPackets.sendMakeMeshPacket(user, bEntity, sel.min, sel.max)
 
             return bEntity
         }
