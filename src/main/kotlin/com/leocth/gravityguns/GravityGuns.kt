@@ -1,9 +1,9 @@
 package com.leocth.gravityguns
 
 import com.leocth.gravityguns.config.GravityGunsConfig
+import com.leocth.gravityguns.data.GrabbedBlockPosSelection
 import com.leocth.gravityguns.data.GravityGunsTags
 import com.leocth.gravityguns.entity.BlockAsAnEntity
-import com.leocth.gravityguns.data.CompactBlockStates
 import com.leocth.gravityguns.item.GravityGunItem
 import com.leocth.gravityguns.network.GravityGunsC2SPackets
 import com.leocth.gravityguns.physics.GrabbingManager
@@ -31,14 +31,15 @@ object GravityGuns: ModInitializer {
 
     val ITEM_GROUP: ItemGroup = FabricItemGroupBuilder.build(id("group")) { ItemStack(GRAVITY_GUN) }
     val GRAVITY_GUN = GravityGunItem(defaultSettings.maxDamage(2000))
-    var CONFIG = GravityGunsConfig()
-        private set
 
+    private val CONFIG_PATH = FabricLoader.getInstance().configDir.resolve("gravityguns.json")
     private val defaultSettings: Item.Settings get() = Item.Settings().group(ITEM_GROUP)
     private val JSON = Json {
         prettyPrint = true
         encodeDefaults = true
     }
+    var CONFIG = GravityGunsConfig()
+        private set
 
 
     override fun onInitialize() {
@@ -51,11 +52,14 @@ object GravityGuns: ModInitializer {
     inline fun id(path: String) = Identifier(MOD_ID, path)
 
     private fun updateConfig() {
-        val path = FabricLoader.getInstance().configDir.resolve("gravityguns.json")
-        if (path.exists()) {
-            CONFIG = JSON.decodeFromString(Files.readString(path))
+        if (CONFIG_PATH.exists()) {
+            CONFIG = JSON.decodeFromString(Files.readString(CONFIG_PATH))
         }
-        Files.writeString(path, JSON.encodeToString(CONFIG))
+        saveConfig()
+    }
+
+    internal fun saveConfig() {
+        Files.writeString(CONFIG_PATH, JSON.encodeToString(CONFIG))
     }
 
     private fun registerStuff() {
@@ -66,7 +70,7 @@ object GravityGuns: ModInitializer {
         Registry.register(Registry.ITEM, id("gravity_gun"), GRAVITY_GUN)
         Registry.register(Registry.ENTITY_TYPE, id("block"), BlockAsAnEntity.TYPE)
 
-        TrackedDataHandlerRegistry.register(CompactBlockStates.DATA_HANDLER)
+        TrackedDataHandlerRegistry.register(GrabbedBlockPosSelection.DATA_HANDLER)
     }
 
     private fun registerEvents() {

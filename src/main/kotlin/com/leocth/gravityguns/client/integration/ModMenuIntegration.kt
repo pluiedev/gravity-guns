@@ -4,8 +4,10 @@ import com.leocth.gravityguns.GravityGuns
 import com.leocth.gravityguns.config.GravityGunsConfig
 import com.terraformersmc.modmenu.api.ConfigScreenFactory
 import com.terraformersmc.modmenu.api.ModMenuApi
+import kotlinx.serialization.encodeToString
 import me.shedaniel.clothconfiglite.api.ConfigScreen
 import net.minecraft.text.TranslatableText
+import java.nio.file.Files
 import kotlin.reflect.KMutableProperty0
 
 @Suppress("unused")
@@ -25,6 +27,7 @@ object ModMenuIntegration: ModMenuApi {
     private inline fun <reified V> ConfigScreen.addProp(translationKey: String, prop: KMutableProperty0<V>, def: V) {
         add(TranslatableText(translationKey), prop.get(), { def }) {
             prop.set(it as? V ?: def)
+            GravityGuns.saveConfig()
         }
     }
 }
