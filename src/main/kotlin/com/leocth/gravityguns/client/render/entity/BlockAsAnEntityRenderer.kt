@@ -14,11 +14,7 @@ import net.minecraft.client.texture.SpriteAtlasTexture
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Identifier
 import com.leocth.gravityguns.util.ext.frame
-import net.minecraft.block.BlockRenderType
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.RenderLayers
-import net.minecraft.client.render.WorldRenderer
 import net.minecraft.client.render.block.BlockRenderManager
 import net.minecraft.util.math.Quaternion as QuaternionMC
 
@@ -40,7 +36,7 @@ class BlockAsAnEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRender
         light: Int
     ) {
         val mesh = entity.mesh ?: return
-        val states = entity.states
+        val states = entity.selection
 
         matrices.frame { stack ->
             val rigidBody = entity.rigidBody
