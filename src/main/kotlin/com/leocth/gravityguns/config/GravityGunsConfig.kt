@@ -7,7 +7,7 @@ data class GravityGunsConfig(
     /**
      * The maximum power level the gravity gun can use. This affects how many blocks one can grab.
      */
-    var maximumPowerLevel: Double = 5.0,
+    var maximumPowerLevel: Double = 3.0,
 
     /**
      * The multiplier for the launch initial velocity; the higher this is, the faster it goes.
@@ -19,7 +19,7 @@ data class GravityGunsConfig(
      *
      * **CAUTION**: this value is *ONLY* read in servers - clients cannot override this to achieve any effect!
      */
-    var entityReachDistance: Double = 7.0,
+    var entityReachDistance: Double = 10.0,
 
     /**
      * The reach distance when finding blocks to grab.
