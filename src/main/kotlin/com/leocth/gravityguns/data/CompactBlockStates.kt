@@ -8,6 +8,7 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
+import net.minecraft.util.math.Vec3d
 
 class CompactBlockStates(
     length: Int,
@@ -28,6 +29,10 @@ class CompactBlockStates(
 
     val size: Int get() = blockStates.size
     val boundingBox: Box get() = Box(offset, offset.add(length, height, width))
+
+    val apparentDisplayOffset: Vec3d by lazy {
+        Vec3d(length / 2.0 + offset.x, height / 2.0 + offset.y, width / 2.0 + offset.z).also(::println)
+    }
 
     init {
         require(length * width * height == size)
@@ -92,7 +97,7 @@ class CompactBlockStates(
         }
     }
 
-    fun indexAt(x: Int, y: Int, z: Int): Int
+    private fun indexAt(x: Int, y: Int, z: Int): Int
         = x + z * length + y * length * width
 
     operator fun get(x: Int, y: Int, z: Int): BlockState
