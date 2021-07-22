@@ -1,14 +1,12 @@
 package com.leocth.gravityguns
 
 import com.leocth.gravityguns.config.GravityGunsConfig
-import com.leocth.gravityguns.data.GrabbedBlockPosSelection
 import com.leocth.gravityguns.data.GravityGunsTags
-import com.leocth.gravityguns.entity.BlockAsAnEntity
+import com.leocth.gravityguns.entity.ClumpEntity
 import com.leocth.gravityguns.item.GravityGunItem
 import com.leocth.gravityguns.network.GravityGunsC2SPackets
 import com.leocth.gravityguns.physics.GrabbingManager
 import com.leocth.gravityguns.sound.GravityGunsSounds
-import dev.lazurite.rayon.core.api.event.collision.ElementCollisionEvents
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -69,19 +67,11 @@ object GravityGuns: ModInitializer {
         GravityGunsSounds.register()
 
         Registry.register(Registry.ITEM, id("gravity_gun"), GRAVITY_GUN)
-        Registry.register(Registry.ENTITY_TYPE, id("block"), BlockAsAnEntity.TYPE)
-
-        TrackedDataHandlerRegistry.register(GrabbedBlockPosSelection.DATA_HANDLER)
+        Registry.register(Registry.ENTITY_TYPE, id("clump"), ClumpEntity.TYPE)
     }
 
     private fun registerEvents() {
         ServerLifecycleEvents.SERVER_STOPPED.register { GrabbingManager.SERVER.instances.clear() }
         ServerTickEvents.END_SERVER_TICK.register { GrabbingManager.SERVER.tick() }
-
-        ElementCollisionEvents.BLOCK_COLLISION.register { element, blockRigidBody, impulse ->
-            if (element is BlockAsAnEntity) {
-                element.onBlockCollision(blockRigidBody, impulse)
-            }
-        }
     }
 }

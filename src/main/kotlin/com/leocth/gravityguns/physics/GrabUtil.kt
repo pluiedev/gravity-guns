@@ -1,19 +1,24 @@
 package com.leocth.gravityguns.physics
 
 import com.leocth.gravityguns.data.GravityGunsTags
-import com.leocth.gravityguns.entity.BlockAsAnEntity
-import com.leocth.gravityguns.network.GravityGunsS2CPackets
+import com.leocth.gravityguns.entity.ClumpEntity
 import net.minecraft.entity.Entity
-import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.EntityHitResult
 import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
+import net.snakefangox.worldshell.transfer.WorldShellConstructor
 
-// Shamelessly stolen from Thinking with Portatos
+// Based on shamelessly stolen code from Thinking with Portatos
 object GrabUtil {
-    fun getEntityToGrab(user: PlayerEntity, reach: Double): Entity? {
+    fun attemptToGrabEntity(
+        mgr: GrabbingManager,
+        user: ServerPlayerEntity,
+        reach: Double
+    ): Boolean {
         val cameraPos = user.getCameraPosVec(1f)
         val rotationVec = user.getRotationVec(1f)
         val extended = rotationVec.multiply(reach)
@@ -23,37 +28,39 @@ object GrabUtil {
 
         val result = raycastEntity(user, cameraPos, end, box, reach) {
             it.type !in GravityGunsTags.IMMOBILE_ENTITIES
-        } ?: return null
+        } ?: return false
 
-        return result.entity?.let {
-            if (it.hasVehicle()) it.vehicle else it
+        result.entity?.also {
+            mgr.tryGrab(user, if (it.hasVehicle()) it.vehicle!! else it)
         }
+        return true
     }
 
-    fun getBlockToGrab(user: PlayerEntity, reach: Double, power: Double): BlockAsAnEntity? {
+    fun attemptToGrabBlock(
+        mgr: GrabbingManager,
+        user: ServerPlayerEntity,
+        world: ServerWorld,
+        reach: Double,
+        power: Double
+    ): Boolean {
         val result = user.raycast(reach, 1f, false)
-        val world = user.world
 
         if (result.type != HitResult.Type.MISS && result is BlockHitResult) {
             val grabShape = CubeGrabShape // TODO
             val blockPos = result.blockPos
             val state = world.getBlockState(blockPos)
 
-            val sel = grabShape.grab(user, world, result.side, blockPos, state, power) ?: return null
+            val sel = grabShape.grab(user, world, result.side, blockPos, state, power) ?: return false
 
-            val bEntity = BlockAsAnEntity(
-                world,
-                Vec3d.ofBottomCenter(blockPos),
-                sel
-            )
-            world.spawnEntity(bEntity)
-            // TODO: this is concern
-            // TODO: also worldmesher disregards the filter, might need to tackle this later
-            GravityGunsS2CPackets.sendMakeMeshPacket(user, bEntity, sel.min, sel.max)
-
-            return bEntity
+            val ctor = WorldShellConstructor.create(world, ClumpEntity.TYPE, blockPos, sel.iterator())
+            ctor.construct {
+                val entity = it.get()!!
+                world.spawnEntity(entity)
+                mgr.tryGrab(user, entity)
+            }
+            return true
         }
-        return null
+        return false
     }
 
     /* NOTE:

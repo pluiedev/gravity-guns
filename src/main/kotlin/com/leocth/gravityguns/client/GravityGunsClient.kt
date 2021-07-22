@@ -1,22 +1,20 @@
 package com.leocth.gravityguns.client
 
 import com.leocth.gravityguns.GravityGuns
-import com.leocth.gravityguns.client.render.entity.BlockAsAnEntityRenderer
+import com.leocth.gravityguns.client.render.entity.ClumpEntityRenderer
 import com.leocth.gravityguns.client.render.item.GravityGunRenderer
-import com.leocth.gravityguns.entity.BlockAsAnEntity
+import com.leocth.gravityguns.entity.ClumpEntity
 import com.leocth.gravityguns.item.GravityGunItem.Companion.power
 import com.leocth.gravityguns.network.GravityGunsC2SPackets
 import com.leocth.gravityguns.network.GravityGunsS2CPackets
 import com.leocth.gravityguns.physics.GrabbingManager
-import dev.lazurite.rayon.core.api.event.collision.ElementCollisionEvents
-import dev.lazurite.rayon.core.impl.util.event.BetterClientLifecycleEvents
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.rendereregistry.v1.EntityRendererRegistry
 import net.minecraft.client.MinecraftClient
-import net.minecraft.text.LiteralText
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.math.MathHelper
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
@@ -29,9 +27,9 @@ object GravityGunsClient: ClientModInitializer {
         GravityGunsS2CPackets.registerListeners()
 
         GeoItemRenderer.registerItemRenderer(GravityGuns.GRAVITY_GUN, GravityGunRenderer())
-        EntityRendererRegistry.INSTANCE.register(BlockAsAnEntity.TYPE, ::BlockAsAnEntityRenderer)
+        EntityRendererRegistry.INSTANCE.register(ClumpEntity.TYPE, ::ClumpEntityRenderer)
 
-        BetterClientLifecycleEvents.DISCONNECT.register { _, _ -> GrabbingManager.CLIENT.instances.clear() }
+        ClientPlayConnectionEvents.DISCONNECT.register { _, _ -> GrabbingManager.CLIENT.instances.clear() }
         ClientTickEvents.END_CLIENT_TICK.register {
             GrabbingManager.CLIENT.tick()
         }

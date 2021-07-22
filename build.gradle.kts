@@ -55,12 +55,11 @@ dependencies {
     modRuntime("com.terraformersmc:modmenu:$modMenuVersion") {
         isTransitive = false
     }
-    modApi("net.dblsaiko.rayon:rayon:$rayonVersion")
-    modImplementation("com.github.glisco03:worldmesher:1.17-SNAPSHOT")
-    include("com.github.glisco03:worldmesher:1.17-SNAPSHOT")
+    //modApi("net.dblsaiko.rayon:rayon:$rayonVersion")
+    //modImplementation("com.github.glisco03:worldmesher:1.17-SNAPSHOT")
+    //include("com.github.glisco03:worldmesher:1.17-SNAPSHOT")
 
     modImplementation("com.github.Snakefangox:worldshell:0.2.6")
-
 }
 
 java {

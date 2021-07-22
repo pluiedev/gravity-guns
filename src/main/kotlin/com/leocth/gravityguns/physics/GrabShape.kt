@@ -1,10 +1,10 @@
 package com.leocth.gravityguns.physics
 
-import com.leocth.gravityguns.data.GrabbedBlockPosSelection
 import com.leocth.gravityguns.data.GravityGunsTags
 import net.minecraft.block.BlockState
 import net.minecraft.block.PistonBlock
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
@@ -12,12 +12,12 @@ import net.minecraft.world.World
 abstract class GrabShape {
     abstract fun grab(
         user: PlayerEntity,
-        world: World,
+        world: ServerWorld,
         direction: Direction,
         hitPoint: BlockPos,
         hitState: BlockState,
-        power: Double,
-    ): GrabbedBlockPosSelection?
+        power: Double
+    ): Iterable<BlockPos>?
 
     // filtering blocks that cannot be grabbed:
     // 1) it cannot allow mobs to spawn inside, i.e. air & cave air
@@ -45,12 +45,13 @@ abstract class GrabShape {
 object CubeGrabShape : GrabShape() {
     override fun grab(
         user: PlayerEntity,
-        world: World,
+        world: ServerWorld,
         direction: Direction,
         hitPoint: BlockPos,
         hitState: BlockState,
         power: Double
-    ): GrabbedBlockPosSelection? {
+    ): Iterable<BlockPos>? {
+        // don't even bother if the player is trying to grab an immutable block
         if (isBlockImmobile(world, hitPoint, hitState)) return null
 
         val half = power.toInt() - 1
@@ -59,8 +60,8 @@ object CubeGrabShape : GrabShape() {
         val min = hitPoint.mutableCopy().move(-half, -half, -half).move(off)
         val max = hitPoint.mutableCopy().move(half, half, half).move(off)
 
-        //TODO: handle edge cases like double blocks, ground foliage, etc
-        return GrabbedBlockPosSelection(min, max, BlockPos.ORIGIN) { getMobileStateOrNull(world, it) }
+        return BlockPos.iterate(min, max)
+            .filter { isBlockImmobile(world, it, world.getBlockState(it)) }
     }
 }
 
