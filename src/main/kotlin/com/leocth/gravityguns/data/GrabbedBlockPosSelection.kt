@@ -31,7 +31,7 @@ class GrabbedBlockPosSelection(
             for (z in 0 until zSize) {
                 for (x in 0 until xSize) {
                     pos.move(x, y, z)
-                    states[i] = Block.getRawIdFromState(populateFunc(pos))
+                    states[i] = populateFunc(pos)?.let { Block.getRawIdFromState(it) } ?: -1
                     pos.set(min)
                     i++
                 }

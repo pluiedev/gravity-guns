@@ -19,6 +19,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityDimensions
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.data.DataTracker
+import net.minecraft.entity.data.TrackedDataHandlerRegistry
 import net.minecraft.fluid.Fluids
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.Packet
@@ -37,12 +38,11 @@ class BlockAsAnEntity(
     var mesh: WorldMesh? = null
         private set
 
-    @get:JvmName("wtfIsThis")
+    @get:JvmName("a")
     private val rigidBody by lazy { EntityRigidBody(this) }
 
-    var selection: GrabbedBlockPosSelection
-        get() = dataTracker.get(SELECTION)
-        private set(value) { dataTracker.set(SELECTION, value) }
+    var selection: GrabbedBlockPosSelection by dataTracker.byKey(SELECTION)
+    var settleTimer: Int by dataTracker.byKey(SETTLE)
 
     init {
         inanimate = true
@@ -61,6 +61,7 @@ class BlockAsAnEntity(
 
     override fun initDataTracker() {
         dataTracker.startTracking(SELECTION, GrabbedBlockPosSelection.EMPTY)
+        dataTracker.startTracking(SETTLE, Int.MAX_VALUE)
     }
 
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
@@ -92,12 +93,28 @@ class BlockAsAnEntity(
 
         if (hasSpace) {
             rigidBody.setDoTerrainLoading(false)
-            kill()
+            settle(physPos)
+        } else {
+            settleTimer = 15
+        }
+    }
 
-            selection.forEachEncompassed(physPos) { pos, state ->
-                world.breakBlock(pos, true)
-                world.setBlockState(pos, state)
-            }
+    private fun settle(pos: BlockPos = BlockPos(rigidBody.getPhysicsLocation(null).toVec3d())) {
+        selection.forEachEncompassed(pos) { p, state ->
+            world.breakBlock(p, true)
+            world.setBlockState(p, state)
+        }
+        settleTimer = Int.MAX_VALUE
+        kill()
+    }
+
+    override fun tick() {
+        super.tick()
+        if (settleTimer < Int.MAX_VALUE) {
+            if (settleTimer <= 0)
+                settle()
+            else
+                settleTimer--
         }
     }
 
@@ -118,6 +135,7 @@ class BlockAsAnEntity(
 
     companion object {
         private val SELECTION = DataTracker.registerData(BlockAsAnEntity::class.java, GrabbedBlockPosSelection.DATA_HANDLER)
+        private val SETTLE = DataTracker.registerData(BlockAsAnEntity::class.java, TrackedDataHandlerRegistry.INTEGER)
 
         val TYPE: EntityType<BlockAsAnEntity> = FabricEntityTypeBuilder.create<BlockAsAnEntity>()
             .dimensions(EntityDimensions.changing(3f, 3f))
