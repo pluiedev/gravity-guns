@@ -1,33 +1,58 @@
 package com.leocth.gravityguns.physics
 
-import com.leocth.gravityguns.data.GravityGunsTags
 import com.leocth.gravityguns.data.GrabbedBlockPosSelection
+import com.leocth.gravityguns.data.GravityGunsTags
 import net.minecraft.block.BlockState
 import net.minecraft.block.PistonBlock
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.util.math.BlockBox
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.World
 
-interface GrabShape {
-    fun compact(
+abstract class GrabShape {
+    abstract fun grab(
         user: PlayerEntity,
         world: World,
         direction: Direction,
         hitPoint: BlockPos,
+        hitState: BlockState,
         power: Double,
-    ): GrabbedBlockPosSelection
+    ): GrabbedBlockPosSelection?
+
+    // filtering blocks that cannot be grabbed:
+    // 1) it cannot allow mobs to spawn inside, i.e. air & cave air
+    // 2) it cannot house block entities, since block entity logic is tricky (although TODO I can add this later...?)
+    // 3) it cannot be denied by the deny list
+    protected fun isBlockImmobile(world: World, pos: BlockPos, state: BlockState): Boolean =
+        state.isAir ||
+        world.getBlockEntity(pos) != null ||
+        state.block in GravityGunsTags.IMMOBILE_BLOCKS ||
+        (
+            state.block is PistonBlock &&
+            state.get(PistonBlock.EXTENDED) // disallow extended pistons
+        )
+
+    protected fun getMobileStateOrNull(world: World, pos: BlockPos): BlockState? {
+        val state = world.getBlockState(pos)
+        return if (!isBlockImmobile(world, pos, state)) {
+            state
+        } else {
+            null
+        }
+    }
 }
 
-object CubeGrabShape: GrabShape {
-    override fun compact(
+object CubeGrabShape : GrabShape() {
+    override fun grab(
         user: PlayerEntity,
         world: World,
         direction: Direction,
         hitPoint: BlockPos,
-        power: Double,
-    ): GrabbedBlockPosSelection {
+        hitState: BlockState,
+        power: Double
+    ): GrabbedBlockPosSelection? {
+        if (isBlockImmobile(world, hitPoint, hitState)) return null
+
         val half = power.toInt() - 1
 
         val off = direction.opposite.vector.multiply(half)
@@ -35,26 +60,7 @@ object CubeGrabShape: GrabShape {
         val max = hitPoint.mutableCopy().move(half, half, half).move(off)
 
         //TODO: handle edge cases like double blocks, ground foliage, etc
-        return GrabbedBlockPosSelection(min, max, BlockPos.ORIGIN) {
-            val state = world.getBlockState(it)
-            if (!isBlockImmobile(world, it, state)) {
-                state
-            } else {
-                null
-            }
-        }
+        return GrabbedBlockPosSelection(min, max, BlockPos.ORIGIN) { getMobileStateOrNull(world, it) }
     }
 }
 
-// filtering blocks that cannot be grabbed:
-// 1) it cannot allow mobs to spawn inside, i.e. air & cave air
-// 2) it cannot house block entities, since block entity logic is tricky (although TODO I can add this later...?)
-// 3) it cannot be denied by the deny list
-private fun isBlockImmobile(world: World, pos: BlockPos, state: BlockState): Boolean
-        = state.isAir ||
-        world.getBlockEntity(pos) != null ||
-        state.block in GravityGunsTags.IMMOBILE_BLOCKS ||
-        (
-            state.block is PistonBlock &&
-            state.get(PistonBlock.EXTENDED) // disallow extended pistons
-        )

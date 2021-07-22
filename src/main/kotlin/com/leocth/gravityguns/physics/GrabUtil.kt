@@ -37,8 +37,9 @@ object GrabUtil {
         if (result.type != HitResult.Type.MISS && result is BlockHitResult) {
             val grabShape = CubeGrabShape // TODO
             val blockPos = result.blockPos
+            val state = world.getBlockState(blockPos)
 
-            val sel = grabShape.compact(user, world, result.side, blockPos, power)
+            val sel = grabShape.grab(user, world, result.side, blockPos, state, power) ?: return null
 
             val bEntity = BlockAsAnEntity(
                 world,
@@ -47,6 +48,7 @@ object GrabUtil {
             )
             world.spawnEntity(bEntity)
             // TODO: this is concern
+            // TODO: also worldmesher disregards the filter, might need to tackle this later
             GravityGunsS2CPackets.sendMakeMeshPacket(user, bEntity, sel.min, sel.max)
 
             return bEntity

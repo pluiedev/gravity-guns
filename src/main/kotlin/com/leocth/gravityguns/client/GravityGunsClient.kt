@@ -31,13 +31,6 @@ object GravityGunsClient: ClientModInitializer {
         GeoItemRenderer.registerItemRenderer(GravityGuns.GRAVITY_GUN, GravityGunRenderer())
         EntityRendererRegistry.INSTANCE.register(BlockAsAnEntity.TYPE, ::BlockAsAnEntityRenderer)
 
-        ElementCollisionEvents.BLOCK_COLLISION.register { element, blockRigidBody, impulse ->
-            if (element is BlockAsAnEntity) {
-                element.onBlockCollision(blockRigidBody, impulse)
-            }
-        }
-
-
         BetterClientLifecycleEvents.DISCONNECT.register { _, _ -> GrabbingManager.CLIENT.instances.clear() }
         ClientTickEvents.END_CLIENT_TICK.register {
             GrabbingManager.CLIENT.tick()
