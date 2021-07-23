@@ -53,10 +53,12 @@ object GrabUtil {
             val sel = grabShape.grab(user, world, result.side, blockPos, state, power) ?: return false
 
             val ctor = WorldShellConstructor.create(world, ClumpEntity.TYPE, blockPos, sel.iterator())
-            ctor.construct {
-                val entity = it.get()!!
+            ctor.construct { res ->
+                val entity = res.get()!!
                 world.spawnEntity(entity)
                 mgr.tryGrab(user, entity)
+
+                sel.forEach { world.removeBlock(it, false) }
             }
             return true
         }

@@ -43,9 +43,9 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable, ISyncabl
         private const val RETRACT = 1
 
         var ItemStack.power: Double
-            get() = tag?.getDouble("power") ?: 0.0
+            get() = nbt?.getDouble("power") ?: 0.0
             set(value) {
-                orCreateTag.putDouble("power", value)
+                orCreateNbt.putDouble("power", value)
             }
     }
 
