@@ -24,7 +24,11 @@ dependencies {
     modImplementation(libs.bundles.fabric)
 
     modImplementation(libs.modmenu)
-    modApi(libs.geckolib)
+    modApi(libs.geckolib) {
+        artifact {
+            classifier = "dev"
+        }
+    }
     modApi(libs.cloth.config.lite)
     include(libs.cloth.config.lite)
     modImplementation(libs.worldshell)
