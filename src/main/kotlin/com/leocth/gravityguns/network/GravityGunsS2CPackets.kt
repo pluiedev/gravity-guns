@@ -96,11 +96,15 @@ object GravityGunsS2CPackets {
     fun sendMakeMeshPacket(owner: PlayerEntity, entity: Entity, p1: BlockPos, p2: BlockPos) {
         if (owner !is ServerPlayerEntity) throw IllegalStateException("this method must be called in the logical server")
 
-        ServerPlayNetworking.send(owner, MAKE_MESH, PacketByteBufs.create().apply {
+        val buf = PacketByteBufs.create().apply {
             writeVarInt(entity.id)
             writeBlockPos(p1)
             writeBlockPos(p2)
-        })
+        }
+        PlayerLookup.tracking(owner).forEach {
+            ServerPlayNetworking.send(it, MAKE_MESH, buf)
+        }
+        ServerPlayNetworking.send(owner, MAKE_MESH, buf)
     }
 
     private inline fun Collection<ServerPlayerEntity>.sendToAll(channelId: Identifier, bufBuilder: PacketByteBuf.() -> Unit) {
