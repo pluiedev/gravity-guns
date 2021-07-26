@@ -31,15 +31,6 @@ abstract class GrabShape {
             state.block is PistonBlock &&
             state.get(PistonBlock.EXTENDED) // disallow extended pistons
         )
-
-    protected fun getMobileStateOrNull(world: World, pos: BlockPos): BlockState? {
-        val state = world.getBlockState(pos)
-        return if (!isBlockImmobile(world, pos, state)) {
-            state
-        } else {
-            null
-        }
-    }
 }
 
 object CubeGrabShape : GrabShape() {
@@ -60,7 +51,17 @@ object CubeGrabShape : GrabShape() {
         val max = hitPoint.mutableCopy().move(half, half, half).move(off)
 
         //TODO: handle edge cases like double blocks, ground foliage, etc
-        return GrabbedBlockPosSelection(min, max, BlockPos.ORIGIN) { getMobileStateOrNull(world, it) }
+        return GrabbedBlockPosSelection.createAndPopulate(min, max, BlockPos.ORIGIN) {
+            val state = world.getBlockState(it)
+            if (isBlockImmobile(world, it, state)) {
+                if (state.isAir)
+                    null
+                else
+                    return null // cancel the selection since an invalid block is included
+            } else {
+                state
+            }
+        }
     }
 }
 

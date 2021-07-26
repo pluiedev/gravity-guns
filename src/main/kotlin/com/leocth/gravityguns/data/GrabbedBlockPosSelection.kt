@@ -16,28 +16,13 @@ class GrabbedBlockPosSelection(
     val min: BlockPos,
     val max: BlockPos,
     val selectionOffset: BlockPos,
-    populateFunc: (BlockPos) -> BlockState? = { null }
 ) {
     val xSize = max.x - min.x + 1
     val ySize = max.y - min.y + 1
     val zSize = max.z - min.z + 1
 
-    internal var states = IntArray(xSize * ySize * zSize)
-
-    init {
-        val pos = min.mutableCopy()
-        var i = 0
-        for (y in 0 until ySize) {
-            for (z in 0 until zSize) {
-                for (x in 0 until xSize) {
-                    pos.move(x, y, z)
-                    states[i] = populateFunc(pos)?.let { Block.getRawIdFromState(it) } ?: -1
-                    pos.set(min)
-                    i++
-                }
-            }
-        }
-    }
+    var states = IntArray(xSize * ySize * zSize)
+        private set
 
     val apparentDisplayOffset: Vec3d by lazy {
         Vec3d(
@@ -101,6 +86,29 @@ class GrabbedBlockPosSelection(
         }
 
         val EMPTY = GrabbedBlockPosSelection(BlockPos.ORIGIN, BlockPos.ORIGIN, BlockPos.ORIGIN)
+
+        inline fun createAndPopulate(
+            min: BlockPos,
+            max: BlockPos,
+            offset: BlockPos,
+            populateFunc: (BlockPos) -> BlockState?
+        ): GrabbedBlockPosSelection {
+            val sel = GrabbedBlockPosSelection(min, max, offset)
+
+            val pos = min.mutableCopy()
+            var i = 0
+            for (y in 0 until sel.ySize) {
+                for (z in 0 until sel.zSize) {
+                    for (x in 0 until sel.xSize) {
+                        pos.move(x, y, z)
+                        sel.states[i] = populateFunc(pos)?.let { Block.getRawIdFromState(it) } ?: -1
+                        pos.set(min)
+                        i++
+                    }
+                }
+            }
+            return sel
+        }
 
         fun readFromNbt(nbt: NbtCompound): GrabbedBlockPosSelection {
             val min = nbt.getBlockPos("min")
