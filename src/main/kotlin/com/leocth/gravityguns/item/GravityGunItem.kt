@@ -42,8 +42,12 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable, ISyncabl
         private const val RETRACT = 1
 
         var ItemStack.power: Double
-            get() = tag?.getDouble("power") ?: 1.0.also {
-                orCreateTag.putDouble("power", it)
+            get() = if (tag?.contains("power") == true) {
+                tag!!.getDouble("power")
+            } else {
+                1.0.also {
+                    orCreateTag.putDouble("power", it)
+                }
             }
             set(value) { orCreateTag.putDouble("power", value) }
     }
