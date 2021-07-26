@@ -31,6 +31,8 @@ object GravityGuns: ModInitializer {
     const val MOD_ID = "gravityguns"
 
     val ITEM_GROUP: ItemGroup = FabricItemGroupBuilder.build(id("group")) { ItemStack(GRAVITY_GUN) }
+
+    @JvmField
     val GRAVITY_GUN = GravityGunItem(defaultSettings.maxDamage(2000))
 
     private val CONFIG_PATH = FabricLoader.getInstance().configDir.resolve("gravityguns.json")
