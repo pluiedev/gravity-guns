@@ -136,9 +136,12 @@ class GrabbingManager(val isServer: Boolean) {
                 )
             }
         }
+        val config = GravityGuns.CONFIG
+        val velocity = unit.multiply(config.launchInitialVelocityMultiplier).toBullet()
 
         val space = MinecraftSpace.get(owner.world)
         space.workerThread.execute {
+            grabbedBody.setLinearVelocity(velocity)
             if (strength > 0f) {
                 grabbedBody.setAngularVelocity(Vector3f(
                     Random.nextFloat() * 4 - 2,

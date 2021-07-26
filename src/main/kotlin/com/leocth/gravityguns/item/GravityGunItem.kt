@@ -16,7 +16,6 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundEvent
 import net.minecraft.util.Hand
-import net.minecraft.util.Identifier
 import net.minecraft.util.TypedActionResult
 import net.minecraft.world.World
 import software.bernie.geckolib3.core.AnimationState
@@ -43,7 +42,9 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable, ISyncabl
         private const val RETRACT = 1
 
         var ItemStack.power: Double
-            get() = tag?.getDouble("power") ?: 0.0
+            get() = tag?.getDouble("power") ?: 1.0.also {
+                orCreateTag.putDouble("power", it)
+            }
             set(value) { orCreateTag.putDouble("power", value) }
     }
 
@@ -54,15 +55,6 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable, ISyncabl
             val grabbingManager = GrabbingManager.SERVER
 
             if (user is ServerPlayerEntity && grabbingManager.isPlayerGrabbing(user)) {
-                val instance = grabbingManager.instances[user.uuid]
-                instance?.let {
-                    val config = GravityGuns.CONFIG
-                    val velocity = user.rotationVector.multiply(config.launchInitialVelocityMultiplier).toBullet()
-                    PhysicsThread.get(world).execute {
-                        it.grabbedBody.setLinearVelocity(velocity)
-                    }
-                }
-
                 grabbingManager.tryUngrab(user, 5.0f)
                 user.itemCooldownManager.set(GravityGuns.GRAVITY_GUN, 15)
                 syncAnimation(user, world, stack, RETRACT)
