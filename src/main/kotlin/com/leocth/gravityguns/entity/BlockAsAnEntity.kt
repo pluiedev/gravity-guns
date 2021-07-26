@@ -111,6 +111,10 @@ class BlockAsAnEntity(
     override fun tick() {
         super.tick()
         if (settleTimer < Int.MAX_VALUE) {
+            // reset if moving
+            if (velocity.lengthSquared() > 3.0)
+                settleTimer = Int.MAX_VALUE
+
             if (settleTimer <= 0)
                 settle()
             else
