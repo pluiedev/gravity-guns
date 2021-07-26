@@ -3,9 +3,10 @@
     "package": "com.leocth.gravityguns.mixin",
     "compatibilityLevel": "JAVA_8",
     "client": [
-        "client.MouseMixin"
+        "client.MouseMixin",
+        "client.BipedEntityModelMixin"
     ],
     "injectors": {
         "defaultRequire": 1
-  }
+    }
 }
