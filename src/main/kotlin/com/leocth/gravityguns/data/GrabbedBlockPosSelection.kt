@@ -59,7 +59,7 @@ class GrabbedBlockPosSelection(
             for (z in 0 until zSize) {
                 for (x in 0 until xSize) {
                     pos.move(x, y, z)
-                    val state = states[i]
+                    val state = states.getOrNull(i) ?: return
                     if (state != -1)
                         action(pos, Block.getStateFromRawId(state))
                     pos.set(basis)
