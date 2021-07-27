@@ -87,19 +87,15 @@ class BlockAsAnEntity(
         val physPos = BlockPos(rigidBody.getPhysicsLocation(null).toVec3d())
         val down = physPos.offset(Direction.DOWN, selection.ySize)
 
-        val hasSpace =
-            !world.getBlockState(down).isAir &&
-            world.getFluidState(down).fluid == Fluids.EMPTY
+        val hasSpace = !world.getBlockState(down).isAir
 
-        if (hasSpace) {
-            rigidBody.setDoTerrainLoading(false)
-            settle(physPos)
-        } else {
+        if (hasSpace && velocity.lengthSquared() <= 1.0) {
             settleTimer = 15
         }
     }
 
     private fun settle(pos: BlockPos = BlockPos(rigidBody.getPhysicsLocation(null).toVec3d())) {
+        rigidBody.setDoTerrainLoading(false)
         selection.forEachEncompassed(pos) { p, state ->
             world.breakBlock(p, true)
             world.setBlockState(p, state)
@@ -112,7 +108,7 @@ class BlockAsAnEntity(
         super.tick()
         if (settleTimer < Int.MAX_VALUE) {
             // reset if moving
-            if (velocity.lengthSquared() > 3.0)
+            if (velocity.lengthSquared() > 1.0)
                 settleTimer = Int.MAX_VALUE
 
             if (settleTimer <= 0)
