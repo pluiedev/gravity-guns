@@ -22,11 +22,12 @@ abstract class GrabShape {
     // filtering blocks that cannot be grabbed:
     // 1) it cannot allow mobs to spawn inside, i.e. air & cave air
     // 2) it cannot house block entities, since block entity logic is tricky (although TODO I can add this later...?)
-    // 3) it cannot be denied by the deny list
+    // 3) it cannot be denied by the deny list or the allow list (if present)
     protected fun isBlockImmobile(world: World, pos: BlockPos, state: BlockState): Boolean =
         state.isAir ||
         world.getBlockEntity(pos) != null ||
-        state.block in GravityGunsTags.IMMOBILE_BLOCKS ||
+        !world.getFluidState(pos).isEmpty ||
+        GravityGunsTags.isImmobile(state.block) ||
         (
             state.block is PistonBlock &&
             state.get(PistonBlock.EXTENDED) // disallow extended pistons
