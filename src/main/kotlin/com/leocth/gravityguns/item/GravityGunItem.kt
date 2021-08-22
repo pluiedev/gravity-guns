@@ -4,8 +4,6 @@ import com.leocth.gravityguns.GravityGuns
 import com.leocth.gravityguns.physics.GrabUtil
 import com.leocth.gravityguns.physics.GrabbingManager
 import com.leocth.gravityguns.util.ext.setAnimation
-import com.leocth.gravityguns.util.ext.toBullet
-import dev.lazurite.rayon.core.impl.bullet.thread.PhysicsThread
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup
 import net.minecraft.client.MinecraftClient
 import net.minecraft.entity.LivingEntity
@@ -102,20 +100,29 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable, ISyncabl
         // TODO: remind myself to fix this bullshit for geckolib
         controller.registerSoundListener(object : AnimationController.ISoundListener {
             override fun <A : IAnimatable> playSound(event: SoundKeyframeEvent<A>) {
+                val player = MinecraftClient.getInstance().player!!
+
+                /* TODO: temporary hack for GeckoLib
+                    Since GeckoLib doesn't check for the owner when the gun is fired, I have to add a special check
+                    to make sure that observers don't receive the event and hear the radiated sound, resulting in a sound
+                    with no attenuation.
+
+                    The reason why GeckoLib doesn't check for that is beyond me.
+                 */
+                if (player.activeItem.item != event.entity) return
+
                 // please, just
                 // spare my life geckolib
                 if (event.controller.animationState == AnimationState.Transitioning) return
 
-                val player = MinecraftClient.getInstance().player!!
-                // look i'm fucking tired alright
                 val volume = if (event.sound == "item.gravity_gun.woo") 0.1f else 1f
 
                 player.world.playSound(
-                    player.x, player.y, player.z,
+                    null,
+                    player.blockPos,
                     SoundEvent(GravityGuns.id(event.sound)),
                     SoundCategory.PLAYERS,
-                    volume, 1f,
-                    true
+                    volume, 1f
                 )
             }
 
