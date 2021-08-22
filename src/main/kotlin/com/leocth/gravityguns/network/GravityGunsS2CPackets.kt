@@ -21,9 +21,9 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 
 object GravityGunsS2CPackets {
-    val GRAB = GravityGuns.id("grab")
-    val UNGRAB = GravityGuns.id("ungrab")
-    val MAKE_MESH = GravityGuns.id("make_mesh")
+    private val GRAB = GravityGuns.id("grab")
+    private val UNGRAB = GravityGuns.id("ungrab")
+    private val MAKE_MESH = GravityGuns.id("make_mesh")
 
     @Environment(EnvType.CLIENT)
     fun registerListeners() {
