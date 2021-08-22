@@ -14,6 +14,7 @@ import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
+import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvent
 import net.minecraft.util.Hand
 import net.minecraft.util.TypedActionResult
@@ -42,14 +43,14 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable, ISyncabl
         private const val RETRACT = 1
 
         var ItemStack.power: Double
-            get() = if (tag?.contains("power") == true) {
-                tag!!.getDouble("power")
+            get() = if (nbt?.contains("power") == true) {
+                nbt!!.getDouble("power")
             } else {
                 1.0.also {
-                    orCreateTag.putDouble("power", it)
+                    orCreateNbt.putDouble("power", it)
                 }
             }
-            set(value) { orCreateTag.putDouble("power", value) }
+            set(value) { orCreateNbt.putDouble("power", value) }
     }
 
     override fun getMaxUseTime(stack: ItemStack): Int = 20000
@@ -105,11 +106,17 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable, ISyncabl
                 // spare my life geckolib
                 if (event.controller.animationState == AnimationState.Transitioning) return
 
-                val player = MinecraftClient.getInstance().player
+                val player = MinecraftClient.getInstance().player!!
                 // look i'm fucking tired alright
                 val volume = if (event.sound == "item.gravity_gun.woo") 0.1f else 1f
 
-                player?.playSound(SoundEvent(GravityGuns.id(event.sound)), volume, 1f)
+                player.world.playSound(
+                    player.x, player.y, player.z,
+                    SoundEvent(GravityGuns.id(event.sound)),
+                    SoundCategory.PLAYERS,
+                    volume, 1f,
+                    true
+                )
             }
 
         })

@@ -21,7 +21,6 @@ import net.minecraft.util.math.Quaternion as QuaternionMC
 @Environment(EnvType.CLIENT)
 class BlockAsAnEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRenderer<BlockAsAnEntity>(ctx) {
 
-    private val blockRenderManager: BlockRenderManager = MinecraftClient.getInstance().blockRenderManager
     private var tempQuat: Quaternion = Quaternion()
     private var tempQuatMc: QuaternionMC = QuaternionMC(0f, 0f, 0f, 0f)
 
@@ -47,7 +46,7 @@ class BlockAsAnEntityRenderer(ctx: EntityRendererFactory.Context) : EntityRender
             val (oX, oY, oZ) = states.apparentDisplayOffset
             stack.translate(-oX, -oY, -oZ)
 
-            mesh.render(matrices.peek().model)
+            mesh.render(matrices)
         }
     }
 
