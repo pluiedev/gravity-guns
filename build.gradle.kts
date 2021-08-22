@@ -32,10 +32,6 @@ dependencies {
     mappings(libs.fabric.yarn)
     modImplementation(libs.bundles.fabric)
     modImplementation(libs.modmenu)
-    modImplementation(libs.lambdynlights) {
-        exclude(group = "com.google.guava") // takes ages to download and ultimately isn't vital
-    }
-
     modApi(libs.geckolib) {
         artifact { classifier = "dev" }
     }
