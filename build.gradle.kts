@@ -29,7 +29,9 @@ repositories {
 
 dependencies {
     minecraft(libs.minecraft)
-    mappings(libs.fabric.yarn)
+    mappings(libs.fabric.yarn){
+        artifact { classifier = "v2" }
+    }
     modImplementation(libs.bundles.fabric)
     modImplementation(libs.modmenu)
     modApi(libs.geckolib) {
