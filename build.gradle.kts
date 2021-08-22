@@ -1,6 +1,7 @@
 plugins {
     id("com.github.johnrengelman.shadow") version "5.2.0"
     id("fabric-loom") version "0.8-SNAPSHOT"
+    id("io.github.juuxel.loom-quiltflower") version "1.3.0"
     kotlin("jvm") version "1.5.10"
     kotlin("plugin.serialization") version "1.5.0"
     `maven-publish`
@@ -27,37 +28,24 @@ repositories {
 }
 
 dependencies {
-    val minecraftVersion: String by project
-    val yarnVersion: String by project
-    val floaderVersion: String by project
-    val fapiVersion: String by project
-    val flkVersion: String by project
-    val geckolibVersion: String by project
-    val clothConfigLiteVersion: String by project
-    val modMenuVersion: String by project
-    val rayonVersion: String by project
-
-    minecraft("com.mojang:minecraft:$minecraftVersion")
-    mappings("net.fabricmc:yarn:$yarnVersion:v2")
-    modImplementation("net.fabricmc:fabric-loader:$floaderVersion")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:$fapiVersion")
-    modImplementation("net.fabricmc:fabric-language-kotlin:$flkVersion")
-
-    modApi("software.bernie.geckolib:geckolib-fabric-1.17:$geckolibVersion:dev")
-    modImplementation("dev.lambdaurora:lambdynamiclights:2.0.1+1.17") {
+    minecraft(libs.minecraft)
+    mappings(libs.fabric.yarn)
+    modImplementation(libs.bundles.fabric)
+    modImplementation(libs.modmenu)
+    modImplementation(libs.lambdynlights) {
         exclude(group = "com.google.guava") // takes ages to download and ultimately isn't vital
     }
-    modApi("me.shedaniel.cloth:cloth-config-lite-fabric:$clothConfigLiteVersion")
-    include("me.shedaniel.cloth:cloth-config-lite-fabric:$clothConfigLiteVersion")
-    modCompileOnly("com.terraformersmc:modmenu:$modMenuVersion") {
-        isTransitive = false
+
+    modApi(libs.geckolib) {
+        artifact { classifier = "dev" }
     }
-    modRuntime("com.terraformersmc:modmenu:$modMenuVersion") {
-        isTransitive = false
-    }
-    modApi("net.dblsaiko.rayon:rayon:$rayonVersion")
-    modImplementation("com.github.glisco03:worldmesher:1.17-SNAPSHOT")
-    include("com.github.glisco03:worldmesher:1.17-SNAPSHOT")
+    modApi(libs.clothconfiglite)
+    include(libs.clothconfiglite)
+
+    modApi(libs.rayon)
+
+    modImplementation(libs.worldmesher)
+    include(libs.worldmesher)
 }
 
 java {
