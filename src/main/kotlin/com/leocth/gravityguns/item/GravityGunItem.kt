@@ -117,9 +117,7 @@ class GravityGunItem(settings: Settings) : Item(settings), IAnimatable, ISyncabl
 
                 val volume = if (event.sound == "item.gravity_gun.woo") 0.1f else 1f
 
-                player.world.playSound(
-                    null,
-                    player.blockPos,
+                player.playSound(
                     SoundEvent(GravityGuns.id(event.sound)),
                     SoundCategory.PLAYERS,
                     volume, 1f
